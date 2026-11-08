@@ -1,0 +1,395 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></head><body>
+<title>Present Perfect Time Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: sticky nav of numbered stations, each a section; a PAST → NOW timeline is the recurring motif. */
+:root{
+  --bg:#F5F5FA; --surface:#FFFFFF; --surface-2:#ECEDF7; --ink:#1B1E3A; --ink-soft:#4C5070;
+  --line:#D2D4E6; --accent:#3B4FC4; --accent-ink:#FFFFFF; --stamp:#F2B134; --stamp-ink:#3A2600;
+  --past:#8A90B0; --good:#1F7A3A; --good-bg:#DDF2E3; --bad:#B3261E; --bad-bg:#FBE3E1;
+  --display:'Bricolage Grotesque','Trebuchet MS',sans-serif; --body:'Atkinson Hyperlegible',Verdana,sans-serif; --r:14px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#11132A; --surface:#1B1E3A; --surface-2:#262A4D; --ink:#EEF0FB; --ink-soft:#B2B6D4; --line:#363B64;
+  --accent:#8F9FFF; --accent-ink:#0E1230; --past:#6E7499; --good:#7FD99A; --good-bg:#183A26; --bad:#FF9C94; --bad-bg:#43201E; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#11132A; --surface:#1B1E3A; --surface-2:#262A4D; --ink:#EEF0FB; --ink-soft:#B2B6D4; --line:#363B64;
+  --accent:#8F9FFF; --accent-ink:#0E1230; --past:#6E7499; --good:#7FD99A; --good-bg:#183A26; --bad:#FF9C94; --bad-bg:#43201E; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.1;margin:0}
+p{margin:0}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--stamp);outline-offset:2px}
+nav.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+nav.top .wrap{display:flex;gap:6px;overflow-x:auto;padding-block:10px;scrollbar-width:thin}
+nav.top a{flex:none;text-decoration:none;color:var(--ink-soft);font-weight:700;font-size:14px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
+nav.top a:hover{color:var(--ink);border-color:var(--accent)}
+nav.top a.brand{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+header.hero{padding-block:48px 28px}
+.hero h1{font-size:clamp(44px,8vw,88px);font-weight:800;letter-spacing:-.02em;margin-block:8px 10px}
+.hero .lead{font-size:20px;color:var(--ink-soft);max-width:44ch}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{font-weight:700;padding:6px 14px;border-radius:999px;background:var(--surface-2)}
+/* timeline motif */
+.tl{position:relative;height:96px;margin-top:20px}
+.tl .axis{position:absolute;left:0;right:0;top:46px;height:4px;background:var(--line);border-radius:2px}
+.tl .bar{position:absolute;top:36px;height:24px;border-radius:12px;background:var(--accent);right:56px;transition:left .4s}
+.tl .start{position:absolute;top:30px;width:36px;height:36px;border-radius:50%;background:var(--stamp);border:4px solid var(--surface);transform:translateX(-50%);transition:left .4s}
+.tl .now{position:absolute;right:0;top:20px;font-family:var(--display);font-weight:800;background:var(--ink);color:var(--bg);padding:6px 10px;border-radius:8px}
+.tl .lab{position:absolute;top:72px;font-weight:700;color:var(--ink-soft);font-size:15px;transform:translateX(-50%);white-space:nowrap}
+.tl .lab.l0{left:0;transform:none}
+section.station{padding-block:40px;border-top:1px solid var(--line)}
+.station-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:20px}
+.station-head h2{font-size:clamp(28px,4.5vw,40px);font-weight:800;margin-top:4px}
+.how{color:var(--ink-soft);max-width:60ch;margin-top:6px}
+.stamp{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;padding:6px 12px;border:2px dashed var(--accent);color:var(--accent);border-radius:8px;transform:rotate(-2deg)}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card.good{border-color:var(--good);background:var(--good-bg)} .card.bad{border-color:var(--bad);background:var(--bad-bg)}
+.big{font-family:var(--display);font-size:30px;font-weight:800}
+.label{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.ex{font-style:italic}
+.soft{color:var(--ink-soft)}
+.hl{color:var(--accent);font-weight:700;font-style:normal}
+.play{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:700;padding:6px 14px;min-height:36px;align-self:flex-start}
+.play svg{width:14px;height:14px;fill:currentColor}
+.play.playing{background:var(--stamp);color:var(--stamp-ink)}
+.btn{border:2px solid var(--ink);background:transparent;border-radius:10px;padding:8px 16px;font-weight:700}
+.btn.solid{background:var(--ink);color:var(--bg)}
+.btn:hover{border-color:var(--accent)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.score{font-family:var(--display);font-weight:800;font-size:22px}
+.opt{border:2px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 16px;font-weight:700}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.right{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.opt:disabled{cursor:default}
+.fb{font-weight:700;min-height:1.5em}
+.fb.good{color:var(--good)} .fb.bad{color:var(--bad)}
+.reveal{border:2px dashed var(--line);background:none;border-radius:10px;padding:8px 14px;font-weight:700;color:var(--ink-soft);text-align:left}
+.reveal.on{border-style:solid;border-color:var(--good);color:var(--good);background:var(--good-bg)}
+table.form{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--r);overflow:hidden}
+table.form th,table.form td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.form th{background:var(--ink);color:var(--bg);font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+.tablewrap{overflow-x:auto}
+.items{display:flex;flex-direction:column;gap:10px}
+.item{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.item .txt{font-family:var(--display);font-size:21px;font-weight:700;min-width:0;flex:1 1 260px}
+.item .blank{display:inline-block;min-width:3.6em;border-bottom:3px solid var(--accent);text-align:center;color:var(--accent)}
+.item.good{border-color:var(--good);background:var(--good-bg)}
+.n{font-family:var(--display);font-weight:800;color:var(--ink-soft);font-size:14px;margin-right:8px}
+.lab-box{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:14px}
+.lab-box input[type=range]{width:100%;accent-color:var(--accent)}
+.lab-box select{padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+.out{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.out p{font-family:var(--display);font-size:24px;font-weight:700;padding:14px 16px;border-radius:12px;background:var(--surface-2)}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;padding:8px;border-radius:12px}
+.tiles.answer{border:2px dashed var(--line);background:var(--surface)}
+.tile{border:2px solid var(--accent);background:var(--surface);color:var(--ink);border-radius:10px;padding:6px 12px;font-weight:700;font-size:19px}
+.answer .tile{background:var(--accent);color:var(--accent-ink)}
+.word3{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.word3 .card .big{color:var(--accent)}
+.interview .card.pick{border:2px solid var(--stamp);box-shadow:0 0 0 4px color-mix(in srgb,var(--stamp) 30%,transparent)}
+.ticket input{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);width:100%}
+details.key{margin-top:18px;background:var(--surface-2);border-radius:var(--r);padding:14px 18px}
+details.key summary{font-weight:700;cursor:pointer}
+footer{padding-block:32px 48px;border-top:1px solid var(--line);color:var(--ink-soft);font-size:14px}
+</style>
+
+<nav class="top" aria-label="Sections"><div class="wrap">
+  <a class="brand" href="#start">Present perfect</a>
+  <a href="#warm">1 · Warm-up</a><a href="#form">2 · Form</a><a href="#forsince">3 · For &amp; since</a>
+  <a href="#howlong">4 · How long?</a><a href="#prac1">5 · For or since?</a><a href="#jay">6 · Just, already, yet</a>
+  <a href="#order">7 · Word order</a><a href="#prac2">8 · Missing word</a><a href="#pair">9 · Pair work</a><a href="#exit">10 · Exit ticket</a>
+</div></nav>
+
+<header class="hero" id="start"><div class="wrap">
+  <p class="eyebrow">English grammar</p>
+  <h1>Present perfect</h1>
+  <p class="lead">We use it for actions that started in the past and continue now, and for things that happened a short time ago or before now.</p>
+  <div class="chips"><span class="chip">for</span><span class="chip">since</span><span class="chip">How long…?</span><span class="chip">just</span><span class="chip">already</span><span class="chip">yet</span></div>
+  <div class="tl" aria-hidden="true"><div class="axis"></div><div class="bar" style="left:18%"></div><div class="start" style="left:18%"></div><span class="lab l0">PAST</span><span class="now">NOW</span></div>
+</div></header>
+
+<main>
+<section class="station" id="warm"><div class="wrap">
+  <div class="station-head"><div><p class="eyebrow">Warm-up · Activity 1</p><h2>A hobby that started in the past</h2>
+  <p class="how">Listen to Ben’s story. Then answer the questions.</p></div></div>
+  <div class="card">
+    <p class="big" style="font-size:24px">Ben started cooking in 2023. He still enjoys cooking today.</p>
+    <div class="tl"><div class="axis"></div><div class="bar" style="left:20%"></div><div class="start" style="left:20%"></div><span class="lab" style="left:20%">2023</span><span class="now">NOW</span></div>
+    <p class="big" style="font-size:26px">Ben <span class="hl">has enjoyed</span> cooking <span class="hl">since 2023</span>.</p>
+    <button class="play" data-say="Ben started cooking in 2023. He still enjoys cooking today. Ben has enjoyed cooking since 2023.">▶ Listen</button>
+  </div>
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card"><b>What year did Ben start cooking?</b><button class="reveal" data-ans="He started cooking in 2023.">Tap to see the answer</button></div>
+    <div class="card"><b>Does he still enjoy it?</b><button class="reveal" data-ans="Yes, he does. He still enjoys it now.">Tap to see the answer</button></div>
+  </div>
+</div></section>
+
+<section class="station" id="form"><div class="wrap">
+  <div class="station-head"><div><p class="eyebrow">Form · Activity 2</p><h2>Have or has + past participle</h2>
+  <p class="how">Use the present perfect to talk about something that started in the past and continues now.</p></div><span class="stamp" id="hhScore">0 / 8</span></div>
+  <div class="tablewrap"><table class="form">
+    <tr><th>Subject</th><th>Form</th><th>Example</th></tr>
+    <tr><td><b>I / you / we / they</b></td><td><span class="hl">have</span> + past participle</td><td class="ex">We have lived here for two years. <button class="play" data-say="We have lived here for two years.">▶</button></td></tr>
+    <tr><td><b>he / she / it</b></td><td><span class="hl">has</span> + past participle</td><td class="ex">She has lived here since 2023. <button class="play" data-say="She has lived here since 2023.">▶</button></td></tr>
+  </table></div>
+  <p class="how" style="margin-top:14px">Short forms: I have → <b>I’ve</b> · she has → <b>she’s</b> · have not → <b>haven’t</b> · has not → <b>hasn’t</b></p>
+  <h3 style="font-size:24px;margin-top:28px">Have or has?</h3>
+  <div class="items" id="hhList" style="margin-top:12px"></div>
+  <h3 style="font-size:24px;margin-top:28px">Past participles in this lesson</h3>
+  <p class="how">Tap a verb to hear it: base form, past participle.</p>
+  <div class="row" id="ppList" style="margin-top:12px"></div>
+</div></section>
+
+<section class="station" id="forsince"><div class="wrap">
+  <div class="station-head"><div><p class="eyebrow">Duration and starting point · Activity 3</p><h2>For and since</h2>
+  <p class="how">Both sentences describe something that is still true now.</p></div></div>
+  <div class="grid g2">
+    <div class="card"><span class="label">For</span><span class="big">How much time?</span><span class="ex">I’ve lived here <span class="hl">for three years</span>.</span><span class="soft">20 minutes · six months · a long time</span><button class="play" data-say="For. How much time? I've lived here for three years.">▶ Listen</button></div>
+    <div class="card"><span class="label">Since</span><span class="big">When did it start?</span><span class="ex">I’ve lived here <span class="hl">since 2023</span>.</span><span class="soft">Monday · 8 a.m. · I was a child</span><button class="play" data-say="Since. When did it start? I've lived here since 2023.">▶ Listen</button></div>
+  </div>
+  <div class="lab-box" style="margin-top:16px">
+    <h3 style="font-size:24px">Time machine</h3>
+    <p class="soft">Choose an activity and move the slider to the year it started. Watch how <b>for</b> and <b>since</b> change.</p>
+    <div class="row"><label for="act"><b>Activity:</b></label>
+      <select id="act"><option value="studied English">study English</option><option value="lived in my town">live in my town</option><option value="played football">play football</option><option value="had my pet">have my pet</option><option value="known my best friend">know my best friend</option></select></div>
+    <label for="year"><b>Started in: <span id="yearOut"></span></b></label>
+    <input type="range" id="year" min="2012" step="1">
+    <div class="tl"><div class="axis"></div><div class="bar" id="tmBar"></div><div class="start" id="tmDot"></div><span class="lab" id="tmLab"></span><span class="now">NOW</span></div>
+    <div class="out"><p id="outSince"></p><p id="outFor"></p></div>
+    <button class="play" id="tmSay">▶ Listen to both</button>
+  </div>
+</div></section>
+
+<section class="station" id="howlong"><div class="wrap">
+  <div class="station-head"><div><p class="eyebrow">Questions · Activity 4</p><h2>How long…?</h2>
+  <p class="how">Ask about the duration of an activity or situation that continues now.</p></div></div>
+  <div class="card">
+    <span class="label">Pattern</span>
+    <p class="big" style="font-size:24px">How long + <span class="hl">have / has</span> + subject + <span class="hl">past participle</span>?</p>
+    <p class="ex" style="font-size:20px">How long have you studied English?</p>
+    <div class="grid g2"><p class="ex">I’ve studied English <span class="hl">for two years</span>.</p><p class="ex">I’ve studied English <span class="hl">since 2024</span>.</p></div>
+    <p class="soft">Either answer tells us how long.</p>
+    <button class="play" data-say="How long have you studied English? I've studied English for two years. I've studied English since 2024.">▶ Listen</button>
+  </div>
+  <h3 style="font-size:24px;margin-top:28px">Make the question</h3>
+  <p class="how">Choose the correct question for each answer.</p>
+  <div class="items" id="qList" style="margin-top:12px"></div>
+</div></section>
+
+<section class="station" id="prac1"><div class="wrap">
+  <div class="station-head"><div><p class="eyebrow">Quick practice · Activity 5</p><h2>For or since?</h2>
+  <p class="how">Choose for or since. Say the full time phrase and explain your choice: how much time, or when it started?</p></div><span class="stamp" id="fsScore">0 / 12</span></div>
+  <div class="items" id="fsList"></div>
+</div></section>
+
+<section class="station" id="jay"><div class="wrap">
+  <div class="station-head"><div><p class="eyebrow">Time words · Activity 6</p><h2>Just, already and yet</h2>
+  <p class="how">Imagine three students talking about the same homework.</p></div></div>
+  <div class="word3">
+    <div class="card"><span class="label">Just</span><span class="big">just</span><span class="soft">A very short time ago</span><span class="ex">“I’ve just finished my homework.”</span><button class="play" data-say="I've just finished my homework.">▶ Listen</button></div>
+    <div class="card"><span class="label">Already</span><span class="big">already</span><span class="soft">Before now, often sooner than expected</span><span class="ex">“I’ve already finished my homework.”</span><button class="play" data-say="I've already finished my homework.">▶ Listen</button></div>
+    <div class="card"><span class="label">Yet</span><span class="big">yet</span><span class="soft">Up to now (questions and negatives)</span><span class="ex">“I haven’t finished my homework yet.”</span><button class="play" data-say="I haven't finished my homework yet.">▶ Listen</button></div>
+  </div>
+</div></section>
+
+<section class="station" id="order"><div class="wrap">
+  <div class="station-head"><div><p class="eyebrow">Word order · Activity 7</p><h2>Build the sentence</h2>
+  <p class="how"><b>just / already</b> go after have or has, before the past participle. <b>yet</b> usually goes at the end of questions and negatives. Tap the words in the right order.</p></div><span class="stamp" id="boScore">1 / 6</span></div>
+  <div class="lab-box">
+    <p class="soft" id="boHint"></p>
+    <div class="tiles answer" id="boAnswer" aria-label="Your sentence"></div>
+    <div class="tiles" id="boBank" aria-label="Word bank"></div>
+    <div class="row"><button class="btn solid" id="boCheck">Check</button><button class="btn" id="boClear">Clear</button><button class="btn" id="boNext">Next sentence ›</button><span class="fb" id="boFb"></span></div>
+  </div>
+</div></section>
+
+<section class="station" id="prac2"><div class="wrap">
+  <div class="station-head"><div><p class="eyebrow">Practice · Activity 8</p><h2>The missing time word</h2>
+  <p class="how">Complete each sentence with just, already or yet. Read the clue after the sentence.</p></div><span class="stamp" id="jayScore">0 / 8</span></div>
+  <div class="items" id="jayList"></div>
+</div></section>
+
+<section class="station interview" id="pair"><div class="wrap">
+  <div class="station-head"><div><p class="eyebrow">Pair work · Activity 9</p><h2>How long have you…?</h2>
+  <p class="how">Take turns asking and answering. Use for or since in your answer.</p></div><button class="btn solid" id="pickQ">🎲 Pick a question for us</button></div>
+  <div class="grid g3" id="pairGrid"></div>
+</div></section>
+
+<section class="station" id="exit"><div class="wrap">
+  <div class="station-head"><div><p class="eyebrow">Exit ticket · Activity 10</p><h2>Three sentences to check</h2>
+  <p class="how">Write your answers here and in your notebook. Then press Check.</p></div></div>
+  <div class="grid ticket" style="gap:12px">
+    <div class="card"><label for="t1"><span class="n">1</span><b>Complete:</b> I’ve lived here ___ five years.</label><input id="t1" autocomplete="off" placeholder="for / since"><div class="row"><button class="btn" data-check="1">Check</button><span class="fb" id="fb1"></span></div></div>
+    <div class="card"><label for="t2"><span class="n">2</span><b>Complete:</b> I’ve known her ___ 2022.</label><input id="t2" autocomplete="off" placeholder="for / since"><div class="row"><button class="btn" data-check="2">Check</button><span class="fb" id="fb2"></span></div></div>
+    <div class="card"><label for="t3"><span class="n">3</span><b>Rewrite with yet:</b> They haven’t finished the exercise.</label><input id="t3" autocomplete="off" placeholder="Write the full sentence"><div class="row"><button class="btn" data-check="3">Check</button><span class="fb" id="fb3"></span></div></div>
+  </div>
+  <details class="key"><summary>Answer key for the teacher</summary>
+    <p style="margin-top:8px"><b>For or since? (presentation items 1–6):</b> 1 for · 2 since · 3 for · 4 since · 5 for · 6 since</p>
+    <p><b>The missing time word (items 1–4):</b> 1 just · 2 already · 3 yet · 4 yet</p>
+    <p><b>Exit ticket:</b> 1 for · 2 since · 3 They haven’t finished the exercise yet.</p>
+  </details>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <p>Present perfect: for, since, How long…?, just, already and yet. The audio uses your device’s English voice, so it can sound different on each computer or phone.</p>
+  <p id="ttsWarn" hidden style="margin-top:8px;color:var(--bad)">This browser has no text-to-speech voice, so the ▶ buttons cannot play audio here.</p>
+</div></footer>
+
+<script>
+(function(){
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const plain = s => s.replace(/[’‘]/g, "'");
+const norm = s => plain(String(s)).toLowerCase().replace(/[.?!,]/g, '').replace(/\s+/g, ' ').trim();
+
+/* audio (speech synthesis) */
+let voice = null;
+function pickVoice(){ const vs = speechSynthesis.getVoices(); voice = vs.find(v => v.lang === 'en-GB') || vs.find(v => /^en/i.test(v.lang)) || null; }
+const hasTTS = 'speechSynthesis' in window;
+if (hasTTS) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } else { $('#ttsWarn').hidden = false; }
+function say(text, btn){
+  if (!hasTTS) { $('#ttsWarn').hidden = false; return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(plain(text)); u.lang = 'en-GB'; u.rate = 0.88; if (voice) u.voice = voice;
+  if (btn) { btn.classList.add('playing'); u.onend = u.onerror = () => btn.classList.remove('playing'); }
+  speechSynthesis.speak(u);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-say]'); if (b) say(b.dataset.say, b);
+  const r = e.target.closest('.reveal'); if (r && !r.classList.contains('on')) { r.classList.add('on'); r.textContent = '✓ ' + r.dataset.ans; say(r.dataset.ans); }
+});
+
+/* generic choice-list builder */
+function choiceList(el, items, choices, scoreEl, total, sentence){
+  let ok = 0;
+  el.innerHTML = items.map((it, i) => `<div class="item" id="${el.id}-${i}"><span class="txt"><span class="n">${i+1}</span>${it.html}</span>
+    <span class="row">${(it.choices || choices).map(c => `<button class="opt" data-i="${i}" data-c="${esc(c)}">${esc(c)}</button>`).join('')}</span></div>`).join('');
+  el.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    const i = +b.dataset.i, it = items[i];
+    if (b.dataset.c === it.ans) {
+      b.classList.add('right'); ok++;
+      el.querySelectorAll(`.opt[data-i="${i}"]`).forEach(x => x.disabled = true);
+      const blank = $(`#${el.id}-${i} .blank`); if (blank) blank.textContent = it.ans;
+      $(`#${el.id}-${i}`).classList.add('good');
+      say(sentence(it));
+      if (scoreEl) scoreEl.textContent = `${ok} / ${total}`;
+    } else { b.classList.add('wrong'); setTimeout(() => b.classList.remove('wrong'), 800); }
+  });
+}
+const B = '<span class="blank">___</span>';
+
+/* 2. have / has */
+const HH = [['I','lived here for two years','have'],['She','studied French since 2021','has'],['We','known our teacher for a year','have'],['My brother','played football since he was six','has'],['They','had their dog for three months','have'],['It','rained since Monday','has'],['You','been my friend for a long time','have'],['Ben','enjoyed cooking since 2023','has']];
+choiceList($('#hhList'), HH.map(([s,r,a]) => ({html:`${esc(s)} ${B} ${esc(r)}.`, ans:a, s, r})), ['have','has'], $('#hhScore'), 8, it => `${it.s} ${it.ans} ${it.r}.`);
+const PP = [['live','lived'],['study','studied'],['know','known'],['have','had'],['enjoy','enjoyed'],['finish','finished'],['arrive','arrived'],['read','read'],['start','started'],['pass','passed'],['be','been']];
+$('#ppList').innerHTML = PP.map(([b,p]) => `<button class="opt" data-say="${b}, ${p}">${b} → <span class="hl">${p}</span></button>`).join('');
+
+/* 3. time machine */
+const NOWY = Math.max(new Date().getFullYear(), 2026);
+const yr = $('#year'); yr.max = NOWY - 1; yr.value = Math.min(2023, NOWY - 1);
+function tm(){
+  const y = +yr.value, n = NOWY - y, act = $('#act').value;
+  const pct = 4 + (y - 2012) / (NOWY - 2012) * 80;
+  $('#yearOut').textContent = y;
+  $('#tmBar').style.left = pct + '%'; $('#tmDot').style.left = pct + '%'; $('#tmLab').style.left = pct + '%'; $('#tmLab').textContent = y;
+  $('#outSince').innerHTML = `I’ve ${act} <span class="hl">since ${y}</span>.`;
+  $('#outFor').innerHTML = `I’ve ${act} <span class="hl">for ${n} year${n === 1 ? '' : 's'}</span>.`;
+}
+yr.oninput = tm; $('#act').onchange = tm; tm();
+$('#tmSay').onclick = e => say($('#outSince').textContent + ' ' + $('#outFor').textContent, e.currentTarget);
+
+/* 4. how long questions */
+const QS = [
+ {html:'Answer: “I’ve lived here for ten years.”', ans:'How long have you lived here?', choices:['How long have you lived here?','How long has you lived here?','How long you have lived here?']},
+ {html:'Answer: “She’s had her cat since 2022.”', ans:'How long has she had her cat?', choices:['How long have she had her cat?','How long has she had her cat?','How long she has had her cat?']},
+ {html:'Answer: “They’ve played tennis for two months.”', ans:'How long have they played tennis?', choices:['How long have they played tennis?','How long has they played tennis?','How long they played tennis?']}];
+choiceList($('#qList'), shuffle(QS).map(q => ({...q, choices:shuffle(q.choices)})), null, null, 3, it => it.ans);
+
+/* 5. for or since */
+const FS = [['an hour','for'],['last week','since'],['two months','for'],['2022','since'],['a long time','for'],['I was six','since'],['Monday','since'],['20 minutes','for'],['8 a.m.','since'],['six months','for'],['my birthday','since'],['ten days','for']];
+choiceList($('#fsList'), FS.map(([p,a]) => ({html:`${B} ${esc(p)}`, ans:a, p})), ['for','since'], $('#fsScore'), 12, it => `${it.ans} ${it.p}`);
+
+/* 7. sentence builder */
+const BO = [
+ ['She has just arrived.','just: a very short time ago'],
+ ['Has she arrived yet?','A question with yet'],
+ ['I have already finished my homework.','already: before now'],
+ ['We haven’t started the project yet.','A negative with yet'],
+ ['He has just finished his lunch.','just: a very short time ago'],
+ ['Have you done your homework yet?','A question with yet']];
+let bi = 0, picked = [];
+function boLoad(){
+  const s = BO[bi][0]; picked = [];
+  $('#boHint').innerHTML = `<b>Sentence ${bi+1} of ${BO.length}.</b> Clue: ${esc(BO[bi][1])}`;
+  const words = s.replace(/[.?]$/, '').split(' ');
+  const end = s.slice(-1);
+  const bank = shuffle(words.map((w, i) => ({w: i === words.length - 1 ? w + end : w, id:i})));
+  $('#boBank').innerHTML = bank.map(t => `<button class="tile" data-id="${t.id}">${esc(t.w)}</button>`).join('');
+  $('#boAnswer').innerHTML = ''; $('#boFb').textContent = ''; $('#boFb').className = 'fb';
+  $('#boScore').textContent = `${bi+1} / ${BO.length}`;
+}
+$('#boBank').onclick = e => { const t = e.target.closest('.tile'); if (t) $('#boAnswer').appendChild(t); };
+$('#boAnswer').onclick = e => { const t = e.target.closest('.tile'); if (t) $('#boBank').appendChild(t); };
+$('#boClear').onclick = boLoad;
+$('#boCheck').onclick = () => {
+  const built = [...$('#boAnswer').querySelectorAll('.tile')].map(t => t.textContent).join(' ');
+  const target = BO[bi][0];
+  if (!built) { $('#boFb').className = 'fb bad'; $('#boFb').textContent = 'Tap the words first.'; return; }
+  const good = norm(built) === norm(target) && built.charAt(0) === target.charAt(0);
+  $('#boFb').className = 'fb ' + (good ? 'good' : 'bad');
+  $('#boFb').textContent = good ? '✓ Correct! ' + target : '✗ Not yet. Check where just, already or yet goes.';
+  if (good) say(target);
+};
+$('#boNext').onclick = () => { bi = (bi + 1) % BO.length; boLoad(); };
+boLoad();
+
+/* 8. just / already / yet */
+const JAY = [
+ ['He has','arrived. He walked in a minute ago.','just'],
+ ['I’ve','read the book. I finished it last month.','already'],
+ ['We haven’t started the project','','yet'],
+ ['Has your sister passed her driving test','','yet'],
+ ['The film has','started. Sit down quickly!','just'],
+ ['Have you finished your lunch','','yet'],
+ ['She’s','visited Japan three times. She knows it well.','already'],
+ ['I haven’t done my homework','. I’ll do it tonight.','yet']];
+choiceList($('#jayList'), JAY.map(([a,b,ans]) => ({html: b === '' ? `${esc(a)} ${B}${a.startsWith('Has') || a.startsWith('Have') ? '?' : '.'}` : b.startsWith('.') ? `${esc(a)} ${B}${esc(b)}` : `${esc(a)} ${B} ${esc(b)}`, ans, a, b})),
+  ['just','already','yet'], $('#jayScore'), 8,
+  it => it.b === '' ? `${it.a} ${it.ans}${/^Ha(s|ve) /.test(it.a) ? '?' : '.'}` : it.b.startsWith('.') ? `${it.a} ${it.ans}${it.b}` : `${it.a} ${it.ans} ${it.b}`);
+
+/* 9. pair work */
+const PW = [['How long have you studied English?','I’ve studied English for ___.'],['How long have you lived in your town?','I’ve lived here since ___.'],['How long have you had your favourite hobby?','I’ve had this hobby for ___.']];
+$('#pairGrid').innerHTML = PW.map(([q,a],i) => `<div class="card" id="pw${i}"><span class="n">Question ${i+1}</span><span class="big" style="font-size:22px">${esc(q)}</span><span class="ex">${esc(a)}</span><button class="play" data-say="${esc(plain(q))}">▶ Listen</button></div>`).join('');
+$('#pickQ').onclick = () => { document.querySelectorAll('#pairGrid .card').forEach(c => c.classList.remove('pick')); const i = Math.floor(Math.random() * PW.length); $('#pw'+i).classList.add('pick'); say(PW[i][0]); };
+
+/* 10. exit ticket */
+function fb(n, good, msg){ const f = $('#fb'+n); f.className = 'fb ' + (good ? 'good' : 'bad'); f.textContent = (good ? '✓ ' : '✗ ') + msg; }
+document.querySelectorAll('[data-check]').forEach(b => b.onclick = () => {
+  const n = +b.dataset.check, v = norm($('#t'+n).value);
+  if (!v) return fb(n, false, 'Write your answer first.');
+  if (n === 1) v === 'for' || v.includes('for five') ? fb(n, true, 'Yes! “for” + an amount of time.') : fb(n, false, 'Five years is an amount of time. Try again.');
+  if (n === 2) v === 'since' || v.includes('since 2022') ? fb(n, true, 'Yes! “since” + when it started.') : fb(n, false, '2022 is a starting point. Try again.');
+  if (n === 3) {
+    if (v === "they haven't finished the exercise yet" || v === 'they have not finished the exercise yet') fb(n, true, 'Perfect! yet goes at the end.');
+    else if (!v.includes('yet')) fb(n, false, 'Add the word “yet”.');
+    else fb(n, false, 'Put “yet” at the end of the sentence.');
+  }
+});
+})();
+</script>
+
+</body></html>

@@ -1,0 +1,550 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></head><body>
+<title>Unit 3 Plurilingual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: sticky passport-style nav, then stacked activity "stations"; one column on phones, grids wrap. */
+:root{
+  --bg:#F4F6FA; --surface:#FFFFFF; --surface-2:#E9EEF6; --ink:#17233F; --ink-soft:#4A5672;
+  --line:#CDD6E4; --accent:#0E7C7B; --accent-ink:#FFFFFF; --stamp:#F2B134; --stamp-ink:#3A2600;
+  --good:#1F7A3A; --good-bg:#DDF2E3; --bad:#B3261E; --bad-bg:#FBE3E1;
+  --display:'Bricolage Grotesque', 'Trebuchet MS', sans-serif;
+  --body:'Atkinson Hyperlegible', Verdana, sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0F1626; --surface:#18223A; --surface-2:#22304E; --ink:#EEF2FA; --ink-soft:#AEB9D0;
+  --line:#33425F; --accent:#3CC2BF; --accent-ink:#06201F; --stamp:#F2B134; --stamp-ink:#3A2600;
+  --good:#7FD99A; --good-bg:#183A26; --bad:#FF9C94; --bad-bg:#43201E; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F1626; --surface:#18223A; --surface-2:#22304E; --ink:#EEF2FA; --ink-soft:#AEB9D0;
+  --line:#33425F; --accent:#3CC2BF; --accent-ink:#06201F; --stamp:#F2B134; --stamp-ink:#3A2600;
+  --good:#7FD99A; --good-bg:#183A26; --bad:#FF9C94; --bad-bg:#43201E; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.1;margin:0}
+p{margin:0}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--stamp);outline-offset:2px}
+
+nav.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+nav.top .wrap{display:flex;gap:6px;overflow-x:auto;padding-block:10px;scrollbar-width:thin}
+nav.top a{flex:none;text-decoration:none;color:var(--ink-soft);font-weight:700;font-size:14px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
+nav.top a:hover{color:var(--ink);border-color:var(--accent)}
+nav.top a.brand{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+header.hero{padding-block:48px 24px}
+.hero .wrap{display:grid;gap:28px;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);align-items:center}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.hero h1{font-size:clamp(44px,8vw,88px);font-weight:800;letter-spacing:-.02em;margin-block:8px 14px}
+.hero p.lead{font-size:20px;color:var(--ink-soft);max-width:34ch}
+.bubbles{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.bubble{font-family:var(--display);font-weight:700;font-size:22px;padding:10px 18px;border-radius:22px 22px 22px 6px;background:var(--surface);border:2px solid var(--line)}
+.bubble:nth-child(3n+1){transform:rotate(-3deg)} .bubble:nth-child(3n+2){transform:rotate(2deg);background:var(--surface-2)}
+.bubble.big{background:var(--stamp);color:var(--stamp-ink);border-color:var(--stamp)}
+
+section.station{padding-block:40px;border-top:1px solid var(--line)}
+.station-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:20px}
+.station-head h2{font-size:clamp(28px,4.5vw,40px);font-weight:800;margin-top:4px}
+.station-head p.how{color:var(--ink-soft);max-width:60ch;margin-top:6px}
+.stamp{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;padding:6px 12px;border:2px dashed var(--accent);color:var(--accent);border-radius:8px;transform:rotate(-2deg)}
+
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.g3{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card.good{border-color:var(--good);background:var(--good-bg)}
+.card.bad{border-color:var(--bad);background:var(--bad-bg)}
+
+.play{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:700;padding:8px 14px;min-height:40px}
+.play.sm{padding:4px 10px;min-height:32px;font-size:14px}
+.play svg{width:16px;height:16px;fill:currentColor}
+.play.playing{background:var(--stamp);color:var(--stamp-ink)}
+.btn{border:2px solid var(--ink);background:transparent;border-radius:10px;padding:8px 16px;font-weight:700}
+.btn.solid{background:var(--ink);color:var(--bg)}
+.btn:hover{border-color:var(--accent)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.score{font-family:var(--display);font-weight:800;font-size:22px}
+select{padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);width:100%}
+.num{font-family:var(--display);font-weight:800;color:var(--ink-soft);font-size:14px}
+.greet{font-family:var(--display);font-size:28px;font-weight:700}
+.answer{font-weight:700;color:var(--ink-soft);min-height:1.5em}
+.card.good .answer{color:var(--good)} .card.bad .answer{color:var(--bad)}
+
+.kinds{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.kind{border-radius:var(--r);padding:18px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.kind .label{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.kind .word{font-family:var(--display);font-size:34px;font-weight:800}
+.kind .ex{color:var(--ink-soft)}
+.frame{margin-top:14px;padding:14px 18px;border-radius:var(--r);background:var(--surface-2);font-weight:700}
+.frame .row{margin-top:10px}
+.frame input{flex:1 1 140px;min-width:0;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+
+.flip{display:block;width:100%;min-height:190px;border:none;background:none;padding:0;text-align:left}
+.flip-inner{display:block;width:100%;height:100%}
+.face{width:100%;min-height:190px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);padding:14px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;justify-content:center}
+.face.back{background:var(--surface-2);border-color:var(--accent)}
+.flip.on .face.front,.flip:not(.on) .face.back{display:none}
+.face img{width:64px;height:auto}
+.face .cn{font-family:var(--display);font-weight:800;font-size:24px}
+.face small{color:var(--ink-soft);font-size:14px}
+.tip{display:flex;gap:12px;align-items:flex-start;padding:14px 18px;border-radius:var(--r);border:2px dashed var(--stamp);margin-top:16px}
+.tip b{color:var(--ink)}
+
+.quiz{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center;margin-top:20px}
+.quiz img{width:110px;height:auto}
+.quiz .q{font-family:var(--display);font-size:26px;font-weight:700}
+.opts{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.opt{border:2px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 16px;font-weight:700}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.right{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.opt:disabled{cursor:default}
+
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.tab{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-weight:700}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.vw{font-family:var(--display);font-size:26px;font-weight:800}
+.pos{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:6px;background:var(--surface-2);color:var(--ink-soft);align-self:flex-start}
+.mean{color:var(--ink-soft)}
+.ex{font-style:italic}
+
+.gap-list{display:flex;flex-direction:column;gap:10px}
+.gap{display:grid;grid-template-columns:2em minmax(0,1fr) minmax(130px,190px);gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.gap.good{border-color:var(--good);background:var(--good-bg)} .gap.bad{border-color:var(--bad);background:var(--bad-bg)}
+
+.partners{display:flex;flex-direction:column;gap:10px}
+.partner{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.partner .noun{font-family:var(--display);font-size:22px;font-weight:700;min-width:0}
+.partner .noun .slot{display:inline-block;min-width:3.6em;border-bottom:3px solid var(--accent);text-align:center;margin-right:6px;color:var(--accent)}
+.vbtns{display:flex;flex-wrap:wrap;gap:6px}
+
+.teams{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:16px}
+.team{flex:1 1 220px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-radius:var(--r);background:var(--ink);color:var(--bg)}
+.team .pts{font-family:var(--display);font-size:40px;font-weight:800;font-variant-numeric:tabular-nums}
+.team button{border:2px solid var(--bg);background:transparent;color:var(--bg);border-radius:10px;width:40px;height:40px;font-weight:800;font-size:20px}
+
+.q-list{display:flex;flex-direction:column;gap:12px}
+.interview .card.pick{border:2px solid var(--stamp);box-shadow:0 0 0 4px color-mix(in srgb,var(--stamp) 30%,transparent)}
+.ticket{display:flex;flex-direction:column;gap:12px}
+.ticket .card input{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);width:100%}
+.fb{font-weight:700;min-height:1.5em}
+.fb.good{color:var(--good)} .fb.bad{color:var(--bad)}
+.note{font-size:14px;color:var(--ink-soft)}
+footer{padding-block:32px 48px;border-top:1px solid var(--line);color:var(--ink-soft);font-size:14px}
+
+@media (max-width:720px){
+  .hero .wrap{grid-template-columns:1fr}
+  .quiz{grid-template-columns:1fr}
+  .gap{grid-template-columns:2em minmax(0,1fr)}
+  .gap select{grid-column:1 / -1}
+}
+</style>
+
+<nav class="top" aria-label="Sections"><div class="wrap">
+  <a class="brand" href="#start">Unit 3</a>
+  <a href="#hello">1 · Hello challenge</a>
+  <a href="#countries">2 · Countries</a>
+  <a href="#quiz">3 · Who am I?</a>
+  <a href="#words">4 · Learning words</a>
+  <a href="#partners">5 · Word partners</a>
+  <a href="#team">6 · Team game</a>
+  <a href="#interview">7 · Interview</a>
+  <a href="#exit">8 · Exit ticket</a>
+</div></nav>
+
+<header class="hero" id="start"><div class="wrap">
+  <div>
+    <p class="eyebrow">Unit 3 · Languages, countries and nationalities</p>
+    <h1>Plurilingual</h1>
+    <p class="lead">A plurilingual person uses more than one language. How many ways can you say hello?</p>
+    <div class="row" style="margin-top:18px">
+      <button class="play" data-say="A plurilingual person uses more than one language."><svg viewBox="0 0 16 16"><path d="M3 2l11 6-11 6z"/></svg>Listen</button>
+      <a class="btn" href="#hello" style="text-decoration:none;color:var(--ink)">Start the challenge</a>
+    </div>
+  </div>
+  <div class="bubbles" aria-hidden="true">
+    <span class="bubble big">Hello!</span><span class="bubble">¡Hola!</span><span class="bubble">Bonjour !</span><span class="bubble">Ciao!</span><span class="bubble">Olá!</span><span class="bubble">Merhaba</span><span class="bubble">Konnichiwa</span><span class="bubble">Privet</span><span class="bubble">Hallo</span>
+  </div>
+</div></header>
+
+<main>
+<section class="station" id="hello"><div class="wrap">
+  <div class="station-head">
+    <div><p class="eyebrow">Warm-up · Activity 1</p><h2>The hello challenge</h2>
+    <p class="how">Press play. Repeat the greeting aloud. Then choose the language you think it is and press <b>Check my guesses</b>.</p></div>
+    <span class="stamp" id="helloScore">0 / 12</span>
+  </div>
+  <div class="grid g4" id="helloGrid"></div>
+  <div class="row" style="margin-top:16px">
+    <button class="btn solid" id="helloCheck">Check my guesses</button>
+    <button class="btn" id="helloShow">Show the answers</button>
+    <button class="btn" id="helloReset">Try again</button>
+  </div>
+</div></section>
+
+<section class="station" id="countries"><div class="wrap">
+  <div class="station-head">
+    <div><p class="eyebrow">Countries and languages · Activity 2</p><h2>Country, nationality or language?</h2>
+    <p class="how">Three kinds of words help us talk about where we’re from and what we speak.</p></div>
+  </div>
+  <div class="kinds">
+    <div class="kind"><span class="label">Country</span><span class="word">Mexico</span><span class="ex">I’m from Mexico.</span><button class="play sm" data-say="Country. Mexico. I'm from Mexico.">▶ Listen</button></div>
+    <div class="kind"><span class="label">Nationality</span><span class="word">Mexican</span><span class="ex">I’m Mexican.</span><button class="play sm" data-say="Nationality. Mexican. I'm Mexican.">▶ Listen</button></div>
+    <div class="kind"><span class="label">Language</span><span class="word">Spanish</span><span class="ex">I speak Spanish.</span><button class="play sm" data-say="Language. Spanish. I speak Spanish.">▶ Listen</button></div>
+  </div>
+  <div class="frame">
+    Your turn: I’m from ___. I’m ___. I speak ___.
+    <div class="row">
+      <input id="meFrom" placeholder="country" aria-label="Your country" value="Mexico">
+      <input id="meNat" placeholder="nationality" aria-label="Your nationality" value="Mexican">
+      <input id="meLang" placeholder="language" aria-label="Your language" value="Spanish">
+      <button class="play" id="meSay">▶ Hear my sentence</button>
+    </div>
+  </div>
+  <h3 style="font-size:24px;margin-top:32px">Flip the flags</h3>
+  <p class="how note" style="margin-top:4px">Tap a card to see the nationality and language examples. Press ▶ to hear them.</p>
+  <div class="grid g4" id="flagGrid" style="margin-top:14px"></div>
+  <div class="tip"><span aria-hidden="true">💡</span><p><b>Careful!</b> Some words are a nationality <i>and</i> a language: <i>I’m Japanese. I speak Japanese.</i> Spanish is spoken in both Mexico and Argentina, and Switzerland has four national languages.</p></div>
+</div></section>
+
+<section class="station" id="quiz"><div class="wrap">
+  <div class="station-head">
+    <div><p class="eyebrow">Countries and languages · Activity 3</p><h2>Who am I?</h2>
+    <p class="how">Look at the flag. Choose the word that completes the sentence.</p></div>
+    <span class="stamp" id="quizScore">Question 1 / 8 · 0 points</span>
+  </div>
+  <div class="quiz" id="quizBox"></div>
+</div></section>
+
+<section class="station" id="words"><div class="wrap">
+  <div class="station-head">
+    <div><p class="eyebrow">Learning languages · Activity 4</p><h2>Words for learning</h2>
+    <p class="how">Read the meaning. Press ▶ to hear the word and the example. Say them aloud.</p></div>
+  </div>
+  <div class="tabs" role="tablist" id="vocabTabs"></div>
+  <div class="grid g3" id="vocabGrid"></div>
+  <div class="tip"><span aria-hidden="true">💡</span><p><b>practice</b> is a noun (Speaking takes practice). <b>practise</b> is a verb (I practise every day). This is British English spelling.</p></div>
+  <h3 style="font-size:24px;margin-top:32px">Complete the sentences</h3>
+  <p class="how note" style="margin-top:4px">Choose the right word. Is it a noun, a verb or an adjective?</p>
+  <div class="gap-list" id="gapList" style="margin-top:14px"></div>
+  <div class="row" style="margin-top:14px"><button class="btn solid" id="gapCheck">Check</button><span class="score" id="gapScore"></span></div>
+</div></section>
+
+<section class="station" id="partners"><div class="wrap">
+  <div class="station-head">
+    <div><p class="eyebrow">Word partners · Activity 5</p><h2>Do, make, write, take or study?</h2>
+    <p class="how">Choose the verb that goes with each phrase. Then use one phrase in a sentence about school.</p></div>
+    <span class="stamp" id="partnerScore">0 / 6</span>
+  </div>
+  <div class="partners" id="partnerList"></div>
+</div></section>
+
+<section class="station" id="team"><div class="wrap">
+  <div class="station-head">
+    <div><p class="eyebrow">Team game · Activity 6</p><h2>Choose the missing word</h2>
+    <p class="how">Say the full sentence. Your team earns one point for each correct answer.</p></div>
+  </div>
+  <div class="teams">
+    <div class="team"><span>Team A</span><span class="pts" id="ptsA">0</span><span class="row"><button data-team="A" data-d="-1" aria-label="Team A minus one">−</button><button data-team="A" data-d="1" aria-label="Team A plus one">+</button></span></div>
+    <div class="team"><span>Team B</span><span class="pts" id="ptsB">0</span><span class="row"><button data-team="B" data-d="-1" aria-label="Team B minus one">−</button><button data-team="B" data-d="1" aria-label="Team B plus one">+</button></span></div>
+  </div>
+  <div class="q-list" id="teamList"></div>
+</div></section>
+
+<section class="station interview" id="interview"><div class="wrap">
+  <div class="station-head">
+    <div><p class="eyebrow">Pair work · Activity 7</p><h2>A language interview</h2>
+    <p class="how">Take turns asking the questions. Give one reason or example.</p></div>
+    <button class="btn solid" id="pickQ">🎲 Pick a question for us</button>
+  </div>
+  <div class="grid g3" id="interviewGrid"></div>
+</div></section>
+
+<section class="station" id="exit"><div class="wrap">
+  <div class="station-head">
+    <div><p class="eyebrow">Exit ticket · Activity 8</p><h2>Before you go</h2>
+    <p class="how">Write three short answers here and in your notebook. Press <b>Check</b> for a hint.</p></div>
+  </div>
+  <div class="ticket">
+    <div class="card"><span class="num">1</span><label for="t1"><b>Write a greeting and name its language.</b> <span class="note">Example: Ciao – Italian</span></label><input id="t1" autocomplete="off"><div class="row"><button class="btn" data-check="1">Check</button><span class="fb" id="fb1"></span></div></div>
+    <div class="card"><span class="num">2</span><label for="t2"><b>Write one country and its nationality.</b> <span class="note">Example: Egypt – Egyptian</span></label><input id="t2" autocomplete="off"><div class="row"><button class="btn" data-check="2">Check</button><span class="fb" id="fb2"></span></div></div>
+    <div class="card"><span class="num">3</span><label for="t3"><b>Use “practise” or “mistake” in a sentence.</b></label><input id="t3" autocomplete="off"><div class="row"><button class="btn" data-check="3">Check</button><span class="fb" id="fb3"></span></div></div>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <p>Unit 3 · Plurilingual. The greeting recordings come from the class presentation. The other audio uses your device’s English voice, so it can sound different on each computer or phone.</p>
+  <p id="ttsWarn" hidden style="margin-top:8px;color:var(--bad)">This browser has no text-to-speech voice. The greeting recordings still play.</p>
+</div></footer>
+
+<script>
+(function(){
+const AUDIO = {1:"media/greeting-1.mp3",2:"media/greeting-2.mp3",3:"media/greeting-3.mp3",4:"media/greeting-4.mp3",5:"media/greeting-5.mp3",6:"media/greeting-6.mp3",7:"media/greeting-7.mp3",8:"media/greeting-8.mp3",9:"media/greeting-9.mp3",10:"media/greeting-10.mp3",11:"media/greeting-11.mp3",12:"media/greeting-12.mp3"};
+const FLAG = {1:"media/flag-1.png",2:"media/flag-2.png",3:"media/flag-3.png",4:"media/flag-4.png",5:"media/flag-5.png",6:"media/flag-6.png",7:"media/flag-7.png",8:"media/flag-8.png",9:"media/flag-9.png",10:"media/flag-10.png",11:"media/flag-11.png",12:"media/flag-12.png"};
+const PLAY = '<svg viewBox="0 0 16 16"><path d="M3 2l11 6-11 6z"/></svg>';
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[’']/g, "'");
+
+/* ---------- audio ---------- */
+let current = null;
+function playClip(n, btn){
+  if (current) { current.pause(); document.querySelectorAll('.playing').forEach(b => b.classList.remove('playing')); }
+  const a = new Audio(AUDIO[n]); current = a;
+  if (btn) { btn.classList.add('playing'); a.onended = () => btn.classList.remove('playing'); }
+  a.play().catch(() => btn && btn.classList.remove('playing'));
+}
+let voice = null;
+function pickVoice(){
+  if (!('speechSynthesis' in window)) return;
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v => v.lang === 'en-GB') || vs.find(v => /^en/i.test(v.lang)) || null;
+}
+if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } else { $('#ttsWarn').hidden = false; }
+function say(text, btn){
+  if (!('speechSynthesis' in window)) { $('#ttsWarn').hidden = false; return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB'; u.rate = 0.88; if (voice) u.voice = voice;
+  if (btn) { btn.classList.add('playing'); u.onend = u.onerror = () => btn.classList.remove('playing'); }
+  speechSynthesis.speak(u);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-say]'); if (b) say(b.dataset.say, b);
+  const c = e.target.closest('[data-clip]'); if (c) { e.stopPropagation(); playClip(+c.dataset.clip, c); }
+});
+
+/* ---------- 1. hello challenge ---------- */
+const GREET = [[1,'Hola','Spanish'],[2,'Bonjour','French'],[3,'Marhabaan','Arabic'],[4,'Privet','Russian'],[5,'Hallo','German'],[6,'Cześć','Polish'],[7,'Merhaba','Turkish'],[8,'Olá','Portuguese'],[9,'Zdraveite','Bulgarian'],[10,'Sawatdi','Thai'],[11,'Konnichiwa','Japanese'],[12,'Ciao','Italian']];
+const LANGS = GREET.map(g => g[2]).sort();
+function buildHello(){
+  $('#helloGrid').innerHTML = GREET.map(([n,w]) => `
+    <div class="card" id="hc${n}">
+      <div class="row" style="justify-content:space-between"><span class="num">${String(n).padStart(2,'0')}</span><button class="play sm" data-clip="${n}" aria-label="Play greeting ${n}">${PLAY}Play</button></div>
+      <span class="greet">${esc(w)}</span>
+      <select id="hs${n}" aria-label="Language of greeting ${n}"><option value="">Which language?</option>${LANGS.map(l => `<option>${l}</option>`).join('')}</select>
+      <span class="answer" id="ha${n}"></span>
+    </div>`).join('');
+  $('#helloScore').textContent = '0 / 12';
+}
+function checkHello(show){
+  let ok = 0;
+  GREET.forEach(([n,,lang]) => {
+    const card = $('#hc'+n), sel = $('#hs'+n), ans = $('#ha'+n);
+    if (show) sel.value = lang;
+    const right = sel.value === lang; if (right) ok++;
+    card.classList.toggle('good', right); card.classList.toggle('bad', !right);
+    ans.textContent = right ? '✓ ' + lang : (sel.value ? '✗ Not ' + sel.value + '. Try again!' : '✗ Choose a language');
+  });
+  $('#helloScore').textContent = ok + ' / 12';
+}
+buildHello();
+$('#helloCheck').onclick = () => checkHello(false);
+$('#helloShow').onclick = () => checkHello(true);
+$('#helloReset').onclick = buildHello;
+
+/* ---------- 2. countries ---------- */
+const C = [
+ [1,'Mexico','Mexican','Spanish'],[2,'Argentina','Argentinian','Spanish'],[3,'Brazil','Brazilian','Portuguese'],[4,'Egypt','Egyptian','Arabic'],
+ [5,'Austria','Austrian','German'],[6,'Switzerland','Swiss','German, French, Italian, Romansh'],[7,'Bulgaria','Bulgarian','Bulgarian'],[8,'Poland','Polish','Polish'],
+ [9,'Russia','Russian','Russian'],[10,'Turkey','Turkish','Turkish'],[11,'Thailand','Thai','Thai'],[12,'Japan','Japanese','Japanese']];
+$('#flagGrid').innerHTML = C.map(([n,c,nat,lang]) => `
+  <button class="flip" aria-label="${c}: show nationality and language" aria-pressed="false">
+    <span class="flip-inner">
+      <span class="face front"><img src="${FLAG[n]}" alt="Flag of ${c}"><span class="cn">${c}</span><small>Tap to flip</small></span>
+      <span class="face back"><small>Nationality</small><span class="cn">${nat}</span><small>Language examples</small><b>${lang}</b>
+        <span class="play sm" role="button" tabindex="0" data-say="I'm from ${c}. I'm ${nat}. I speak ${lang.replace(/, ([^,]*)$/, ' and $1')}.">${PLAY}Listen</span></span>
+    </span>
+  </button>`).join('');
+document.querySelectorAll('.flip').forEach(f => f.addEventListener('click', e => {
+  if (e.target.closest('[data-say]')) return;
+  f.classList.toggle('on'); f.setAttribute('aria-pressed', f.classList.contains('on'));
+}));
+$('#meSay').onclick = e => say(`I'm from ${$('#meFrom').value || 'Mexico'}. I'm ${$('#meNat').value || 'Mexican'}. I speak ${$('#meLang').value || 'Spanish'}.`, e.currentTarget);
+
+/* ---------- 3. who am I quiz ---------- */
+let Q = [], qi = 0, qpts = 0;
+function makeQuiz(){
+  const pool = [];
+  C.forEach(([n,c,nat,lang]) => {
+    pool.push({n, text:`I’m from ${c}. I’m ___.`, ans:nat, field:2});
+    if (n !== 6) pool.push({n, text:`I’m from ${c}. I speak ___.`, ans:lang, field:3});
+  });
+  Q = shuffle(pool).slice(0, 8); qi = 0; qpts = 0; showQ();
+}
+function showQ(){
+  const box = $('#quizBox');
+  if (qi >= Q.length) {
+    box.innerHTML = `<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+      <span class="q">You got ${qpts} out of ${Q.length}! ${qpts >= 7 ? '🌍 Excellent!' : qpts >= 5 ? '👏 Good job!' : '💪 Keep practising!'}</span>
+      <button class="btn solid" id="qAgain">Play again</button></div>`;
+    $('#qAgain').onclick = makeQuiz; $('#quizScore').textContent = `Finished · ${qpts} points`; return;
+  }
+  const q = Q[qi];
+  const others = shuffle([...new Set(C.map(r => r[q.field]).filter(v => v !== q.ans && !v.includes(',')))]).slice(0, 2);
+  const opts = shuffle([q.ans, ...others]);
+  box.innerHTML = `<img src="${FLAG[q.n]}" alt="A country flag">
+    <div><p class="q">${esc(q.text)}</p>
+    <div class="opts">${opts.map(o => `<button class="opt">${esc(o)}</button>`).join('')}</div>
+    <div class="row" style="margin-top:12px"><span class="fb" id="qfb"></span><button class="btn" id="qNext" hidden>Next ›</button></div></div>`;
+  $('#quizScore').textContent = `Question ${qi + 1} / ${Q.length} · ${qpts} points`;
+  box.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    const right = b.textContent === q.ans; if (right) qpts++;
+    box.querySelectorAll('.opt').forEach(x => { x.disabled = true; if (x.textContent === q.ans) x.classList.add('right'); });
+    if (!right) b.classList.add('wrong');
+    const full = q.text.replace('___', q.ans);
+    $('#qfb').className = 'fb ' + (right ? 'good' : 'bad');
+    $('#qfb').textContent = (right ? '✓ ' : '✗ ') + full;
+    say(full.replace('’', "'"));
+    $('#qNext').hidden = false; $('#qNext').onclick = () => { qi++; showQ(); };
+    $('#quizScore').textContent = `Question ${qi + 1} / ${Q.length} · ${qpts} points`;
+  });
+}
+makeQuiz();
+
+/* ---------- 4. vocabulary ---------- */
+const V = {
+ 'Classwork and exams': [
+  ['essay','noun','a piece of writing','I wrote an essay about my family.'],
+  ['exam','noun','a formal test','We have an English exam tomorrow.'],
+  ['exercise','noun','a short task for practice','Let’s do one more exercise.'],
+  ['homework','noun','schoolwork you do outside class','I do my homework after school.'],
+  ['study','verb','spend time learning','I study English every day.'],
+  ['mistake','noun','something you get wrong','I made a mistake in my essay.']],
+ 'Remember and practise': [
+  ['practice','noun','regular work to get better','Speaking takes practice.'],
+  ['practise','verb','do something to get better','I practise speaking with a friend.'],
+  ['revise','verb','study something again','I revise my notes before an exam.'],
+  ['revision','noun','the act of studying again','I do some revision before a test.'],
+  ['memorise','verb','learn so you can remember','I memorise five new words.'],
+  ['memorisation','noun','the process of learning by heart','Songs can help with memorisation.']],
+ 'Speaking and translating': [
+  ['accuracy','noun','how correct something is','Reading can improve my accuracy.'],
+  ['accurate','adjective','correct','Your translation is accurate.'],
+  ['fluency','noun','the ability to speak smoothly','Practice helps build fluency.'],
+  ['fluent','adjective','able to speak smoothly','She’s fluent in Spanish.'],
+  ['translate','verb','put words into another language','Can you translate this sentence?'],
+  ['translation','noun','words put into another language','This is a Spanish translation.']]
+};
+const groups = Object.keys(V);
+function showGroup(g){
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.g === g));
+  $('#vocabGrid').innerHTML = V[g].map(([w,p,m,ex]) => `
+    <div class="card"><div class="row" style="justify-content:space-between"><span class="vw">${w}</span><span class="pos">${p}</span></div>
+      <span class="mean">${esc(m)}</span><span class="ex">“${esc(ex)}”</span>
+      <div class="row"><button class="play sm" data-say="${w}">${PLAY}Word</button><button class="play sm" data-say="${esc(ex.replace('’',"'"))}">${PLAY}Example</button></div></div>`).join('');
+}
+$('#vocabTabs').innerHTML = groups.map(g => `<button class="tab" role="tab" data-g="${g}">${g}</button>`).join('');
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => showGroup(t.dataset.g));
+showGroup(groups[0]);
+
+const GAPS = [
+ ['I wrote an ___ about my family.','essay',['essay','exam','homework']],
+ ['We have an English ___ tomorrow.','exam',['exam','mistake','essay']],
+ ['I ___ my notes before an exam.','revise',['revise','revision','fluent']],
+ ['Speaking takes ___.','practice',['practice','practise','translate']],
+ ['I ___ speaking with a friend.','practise',['practise','practice','accuracy']],
+ ['Songs can help with ___.','memorisation',['memorisation','memorise','accurate']],
+ ['She’s ___ in Spanish.','fluent',['fluent','fluency','translation']],
+ ['Can you ___ this sentence?','translate',['translate','translation','study']]];
+$('#gapList').innerHTML = GAPS.map(([s,,o],i) => `
+  <div class="gap" id="gp${i}"><span class="num">${i+1}</span><span>${esc(s).replace('___','<b>______</b>')}</span>
+  <select id="gs${i}" aria-label="Answer ${i+1}"><option value="">choose…</option>${shuffle(o).map(x => `<option>${x}</option>`).join('')}</select></div>`).join('');
+$('#gapCheck').onclick = () => {
+  let ok = 0;
+  GAPS.forEach(([s,a],i) => { const v = $('#gs'+i).value, r = v === a; if (r) ok++;
+    $('#gp'+i).classList.toggle('good', r); $('#gp'+i).classList.toggle('bad', !r); });
+  $('#gapScore').textContent = `${ok} / ${GAPS.length}` + (ok === GAPS.length ? ' · Perfect! 🎉' : '');
+};
+
+/* ---------- 5. word partners ---------- */
+const VERBS = ['do','make','write','take','study'];
+const PARTNERS = [['homework','do'],['an exercise','do'],['a mistake','make'],['an essay','write'],['an exam','take'],['English','study']];
+const done = new Set();
+$('#partnerList').innerHTML = PARTNERS.map(([n],i) => `
+  <div class="partner" id="pt${i}"><span class="noun"><span class="slot" id="ps${i}">?</span>${n}</span>
+  <span class="vbtns">${VERBS.map(v => `<button class="opt" data-p="${i}" data-v="${v}">${v}</button>`).join('')}</span></div>`).join('');
+document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => {
+  const i = +b.dataset.p, [n, v] = PARTNERS[i];
+  if (b.dataset.v === v) {
+    b.classList.add('right'); $('#ps'+i).textContent = v; done.add(i);
+    document.querySelectorAll(`[data-p="${i}"]`).forEach(x => x.disabled = true);
+    say(`${v} ${n}`);
+  } else { b.classList.add('wrong'); setTimeout(() => b.classList.remove('wrong'), 700); }
+  $('#partnerScore').textContent = `${done.size} / 6`;
+});
+
+/* ---------- 6. team game ---------- */
+const pts = {A:0, B:0};
+document.querySelectorAll('[data-team]').forEach(b => b.onclick = () => {
+  const t = b.dataset.team; pts[t] = Math.max(0, pts[t] + +b.dataset.d); $('#pts'+t).textContent = pts[t];
+});
+const TEAM = [
+ ['I’m from Brazil. I speak ___.',['Polish','Portuguese','Arabic'],'Portuguese'],
+ ['I’m from Japan. I’m ___.',['Japanese','Thai','Swiss'],'Japanese'],
+ ['Before an exam, I ___ my notes.',['revision','revise','accurate'],'revise'],
+ ['It’s OK to ___ a mistake.',['do','take','make'],'make']];
+$('#teamList').innerHTML = TEAM.map(([s,o],i) => `
+  <div class="card" id="tq${i}"><div class="row"><span class="num">${i+1}</span><span class="q" style="font-family:var(--display);font-size:22px;font-weight:700">${esc(s)}</span></div>
+  <div class="opts" style="margin-top:0">${o.map((x,k) => `<button class="opt" data-tq="${i}">${'ABC'[k]} · ${x}</button>`).join('')}</div>
+  <span class="fb" id="tf${i}"></span></div>`).join('');
+document.querySelectorAll('[data-tq]').forEach(b => b.onclick = () => {
+  const i = +b.dataset.tq, [s,,a] = TEAM[i], v = b.textContent.split(' · ')[1], right = v === a;
+  b.classList.add(right ? 'right' : 'wrong');
+  if (right) {
+    document.querySelectorAll(`[data-tq="${i}"]`).forEach(x => x.disabled = true);
+    const full = s.replace('___', a); $('#tf'+i).className = 'fb good'; $('#tf'+i).textContent = '✓ ' + full; say(full.replace(/’/g, "'"));
+  } else { $('#tf'+i).className = 'fb bad'; $('#tf'+i).textContent = '✗ Not quite. The other team can try!'; }
+});
+
+/* ---------- 7. interview ---------- */
+const IV = [
+ ['What languages can you speak?','I can speak ___.'],
+ ['What language would you like to learn?','I’d like to learn ___ because ___.'],
+ ['How do you practise English?','I practise English by ___.']];
+$('#interviewGrid').innerHTML = IV.map(([q,a],i) => `
+  <div class="card" id="iv${i}"><span class="num">Question ${i+1}</span><span class="vw" style="font-size:22px">${esc(q)}</span>
+  <span class="ex">${esc(a)}</span><button class="play sm" data-say="${esc(q)}" style="align-self:flex-start">${PLAY}Listen</button></div>`).join('');
+$('#pickQ').onclick = () => {
+  document.querySelectorAll('#interviewGrid .card').forEach(c => c.classList.remove('pick'));
+  const i = Math.floor(Math.random() * IV.length); $('#iv'+i).classList.add('pick'); say(IV[i][0]);
+};
+
+/* ---------- 8. exit ticket ---------- */
+const greetWords = ['hello','hi', ...GREET.map(g => norm(g[1]))];
+const langWords = ['english','french','spanish', ...LANGS.map(norm)];
+function fb(n, good, msg){ const f = $('#fb'+n); f.className = 'fb ' + (good ? 'good' : 'bad'); f.textContent = (good ? '✓ ' : '✗ ') + msg; }
+document.querySelectorAll('[data-check]').forEach(b => b.onclick = () => {
+  const n = +b.dataset.check, v = norm($('#t'+n).value);
+  if (!v.trim()) return fb(n, false, 'Write your answer first.');
+  if (n === 1) {
+    const g = greetWords.some(w => v.includes(w)), l = langWords.some(w => v.includes(w));
+    if (g && l) fb(n, true, 'Great! Now write it in your notebook.');
+    else fb(n, false, g ? 'Good greeting! Now add its language.' : 'Write a greeting, for example “Hola – Spanish”.');
+  }
+  if (n === 2) {
+    const hit = C.find(([, c, nat]) => v.includes(norm(c)) && v.includes(norm(nat)));
+    const anyC = C.find(([, c]) => v.includes(norm(c)));
+    if (hit) fb(n, true, `Yes! ${hit[1]} → ${hit[2]}.`);
+    else if (anyC) fb(n, false, `Good country! The nationality is “${anyC[2]}”.`);
+    else fb(n, true, 'Nice! Check your spelling with the flag cards above.');
+  }
+  if (n === 3) {
+    const has = /\bpractise|\bmistake/.test(v), words = v.trim().split(/\s+/).length;
+    if (!has && /\bpractice\b/.test(v)) fb(n, false, 'Remember: the verb is “practise” with an s.');
+    else if (!has) fb(n, false, 'Use the word “practise” or “mistake”.');
+    else if (words < 4) fb(n, false, 'Make your sentence a little longer.');
+    else fb(n, true, 'Well done! Read it aloud to a partner.');
+  }
+});
+})();
+</script>
+
+</body></html>
