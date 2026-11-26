@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>What's the matter? – Health problems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;800;900&display=swap">
+<style>
+:root{
+  --bg:#F2F8F8; --surface:#FFFFFF; --surface-2:#E6F1F1; --ink:#14303A; --ink-soft:#4F6870; --line:#CFE1E2;
+  --teal:#0E7C7B; --teal-ink:#F2FFFE; --blue:#2D5FB8; --blue-bg:#E3ECFB; --coral:#E4572E; --sun:#F6B93B; --sun-soft:#FFF3D6;
+  --good:#1F7A3A; --good-bg:#DDF2E3; --bad:#B3261E; --bad-bg:#FBE3E1;
+  --display:'Fredoka','Trebuchet MS',sans-serif; --body:'Nunito','Segoe UI',Verdana,sans-serif; --r:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:600;font-size:clamp(18px,1.55vw,24px);line-height:1.4;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;overscroll-behavior:none;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;border:0;cursor:pointer;touch-action:manipulation;background:none}
+h1,h2{font-family:var(--display);font-weight:700;margin:0;line-height:1.1}
+
+.top{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--teal);color:var(--teal-ink);flex-wrap:wrap}
+.top h1{font-size:clamp(24px,2.4vw,36px);margin-right:auto;white-space:nowrap}
+.top h1 span{color:var(--sun)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{min-height:56px;padding:6px 16px;border-radius:999px;background:rgba(255,255,255,.14);color:var(--teal-ink);font-weight:800;display:flex;align-items:center;gap:8px}
+.tab .n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.22);font-size:.85em}
+.tab[aria-selected=true]{background:var(--sun);color:#3A2600}
+.tab[aria-selected=true] .n{background:#3A2600;color:var(--sun)}
+.stars{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.2);padding:6px 16px;border-radius:999px;font-weight:900;font-size:1.15em;min-height:56px}
+.iconbtn{min-width:56px;min-height:56px;border-radius:50%;background:rgba(255,255,255,.14);color:var(--teal-ink);font-size:24px;display:grid;place-items:center}
+
+main{flex:1;min-height:0;overflow:auto;padding:16px}
+section{display:none;max-width:1500px;margin:0 auto}
+section.on{display:block;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.instr{display:flex;align-items:center;gap:12px;margin:0 0 14px;flex-wrap:wrap}
+.instr h2{font-size:clamp(26px,2.6vw,40px);color:var(--teal)}
+.instr p{margin:0;color:var(--ink-soft)}
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:8px 20px;border-radius:999px;background:var(--surface);border:2px solid var(--line);font-weight:800}
+.pill.primary{background:var(--teal);color:var(--teal-ink);border-color:var(--teal)}
+.pill.sun{background:var(--sun);border-color:var(--sun);color:#3A2600}
+.pill:active,.chip:active,.opt:active,.tab:active,.photo-card:active{transform:scale(.96)}
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:18px}
+.panel h3{margin:0 0 6px;font-family:var(--display);font-weight:600;font-size:1.25em;color:var(--teal)}
+.hint{font-size:.88em;color:var(--ink-soft);margin:0 0 10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.shake{animation:shake2 .45s}
+@keyframes shake2{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes pop{from{transform:scale(.2)}to{transform:scale(1)}}
+
+/* ---------- 1 LOOK ---------- */
+.match{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:16px;align-items:start}
+.scene{position:relative;border-radius:var(--r);overflow:hidden;box-shadow:0 10px 30px rgba(10,60,60,.18);line-height:0;container-type:inline-size;background:#fff}
+.scene img{width:100%;display:block;pointer-events:none;-webkit-user-drag:none}
+.zone{position:absolute;border-radius:6px;line-height:1;padding:0}
+.zone::before{content:"";position:absolute;inset:-12px -8px}
+.zone::after{content:"";position:absolute;inset:-3px;border:3px dashed transparent;border-radius:8px}
+.picking .zone:not(.done)::after{border-color:var(--coral);background:rgba(228,87,46,.15);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.zone.hover::after{background:rgba(228,87,46,.4)!important}
+.zone .tag{display:none;position:absolute;inset:0;left:auto;right:0;width:calc(100% - var(--nw));background:#fff;color:var(--blue);font-family:var(--body);font-weight:900;font-size:1.95cqw;align-items:center;padding-left:.4em;white-space:nowrap;border-radius:0 6px 6px 0}
+.zone.done .tag{display:flex;animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+.zone.wrong{animation:shake2 .45s}
+.bank{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.bank h3{margin:0;font-size:.9em;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chip{min-height:58px;padding:8px 10px;border-radius:14px;background:var(--sun-soft);border:3px solid var(--sun);font-weight:900;text-align:left;display:flex;align-items:center;gap:8px;touch-action:none}
+.chip .e{font-size:1.2em;flex:none}
+.chip.sel{background:var(--teal);color:#fff;border-color:var(--teal);box-shadow:0 0 0 5px rgba(14,124,123,.25)}
+.chip.gone{opacity:.25;pointer-events:none;background:var(--surface-2);border-color:var(--line);text-decoration:line-through}
+.ghost{position:fixed;z-index:50;pointer-events:none;transform:translate(-50%,-50%) scale(1.08);opacity:.95;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+
+/* ---------- 2 SONG ---------- */
+.song{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.verse{background:var(--surface-2);border-radius:16px;padding:14px 16px}
+.verse h4{margin:0 0 6px;font-family:var(--display);font-weight:600;color:var(--blue)}
+.verse.mid{background:var(--sun-soft);border:3px solid var(--sun)}
+.lyr{display:block;padding:3px 6px;border-radius:8px;font-weight:800}
+.lyr.now{background:var(--sun);color:#3A2600}
+.gap{display:inline-block;min-width:4.6em;border-bottom:3px solid var(--ink-soft);text-align:center;color:transparent;border-radius:4px}
+.gap.next{background:#fff;border-color:var(--coral);box-shadow:0 0 0 3px rgba(228,87,46,.3);animation:pulse 1.2s infinite}
+.gap.ok{color:var(--good);border-color:var(--good);animation:pop .4s}
+.songbank{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}
+.songbank .chip{touch-action:manipulation}
+
+/* ---------- 3 DIALOGUE ---------- */
+.dialog{display:flex;flex-direction:column;gap:8px}
+.line{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:16px;background:var(--surface-2);border:3px solid transparent;font-weight:700}
+.line .who{flex:none;min-width:84px;min-height:44px;color:var(--c);font-weight:900;display:flex;gap:4px;align-items:flex-start}
+.line.playing{border-color:var(--sun);background:var(--sun-soft)}
+.w{border-radius:6px;padding:0 2px;cursor:pointer}
+.hunting .w{border-bottom:2px dotted #9fb7bb}
+.w.found{background:none;outline:3px solid var(--coral);border-radius:50%;padding:0 6px;color:var(--coral);font-weight:900}
+.w.nope{background:var(--bad-bg)}
+.counter{font-weight:900;color:var(--coral)}
+.mc{display:grid;gap:10px}
+.opt{min-height:60px;border-radius:16px;background:var(--surface-2);border:3px solid var(--line);font-weight:900;padding:10px 16px;text-align:left}
+.opt.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.opt.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad);animation:shake2 .45s}
+.gbox{border:3px solid var(--blue);border-radius:16px;overflow:hidden;margin-top:14px}
+.gbox .h{background:var(--blue);color:#fff;font-family:var(--display);font-weight:600;padding:8px 14px;font-size:1.1em}
+.gtable{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.gtable div{padding:10px 14px;border-top:2px solid var(--line)}
+.gtable div:nth-child(odd){border-right:2px solid var(--line)}
+.gtable b{color:var(--teal)}
+.gtable .k{font-weight:900;color:var(--ink-soft);font-size:.85em;text-transform:uppercase;letter-spacing:.05em}
+
+/* ---------- 4 LISTEN & NUMBER ---------- */
+.photos{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.photo-card{position:relative;background:var(--surface);border:4px solid var(--line);border-radius:22px;padding:10px;display:flex;flex-direction:column;gap:10px;text-align:center}
+.photo-card img{width:100%;border-radius:14px;display:block;pointer-events:none}
+.photo-card .badge{position:absolute;top:4px;left:4px;width:58px;height:58px;border-radius:16px;background:#fff;border:3px solid var(--line);display:grid;place-items:center;font-family:var(--display);font-size:1.7em;color:var(--coral)}
+.photo-card.ok{border-color:var(--good)}
+.photo-card.ok .badge{background:var(--coral);color:#fff;border-color:var(--coral);animation:pop .4s}
+.photo-card .let{font-weight:900;color:var(--ink-soft)}
+.photo-card .sent{font-weight:900;font-size:1.05em;min-height:2.6em}
+.photo-card .sent .ch{display:inline-block;color:var(--teal);border-bottom:3px solid var(--teal);padding:0 4px}
+.photo-card .btns{display:flex;gap:8px;justify-content:center}
+.photo-card .btns .opt{text-align:center;min-height:56px;flex:1;padding:6px}
+.lock .btns{opacity:.35;pointer-events:none}
+.nowplay{font-family:var(--display);font-size:1.4em;color:var(--blue);min-height:1.5em;text-align:center;margin:10px 0}
+
+/* ---------- 5 TEAM TIME ---------- */
+.teams{display:flex;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.team{min-width:230px;padding:10px 22px;border-radius:var(--r);border:4px solid var(--c);background:var(--surface);display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:900;font-size:1.1em}
+.team .sc{font-family:var(--display);font-size:1.8em;color:var(--c);min-width:1.2em;text-align:center}
+.team .plus{min-width:56px;min-height:56px;border-radius:50%;background:var(--c);color:#fff;font-size:1.4em}
+.mime{max-width:900px;margin:0 auto;background:var(--surface);border-radius:28px;padding:24px;text-align:center;box-shadow:0 10px 30px rgba(10,60,60,.12);border-top:12px solid var(--coral)}
+.card{min-height:250px;border-radius:22px;background:var(--surface-2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin:12px 0}
+.card .emo{font-size:4.6em;line-height:1}
+.card .word{font-family:var(--display);font-size:2.2em;color:var(--teal)}
+.card.hidden .emo,.card.hidden .word{filter:blur(22px);opacity:.4}
+.bubbles{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:8px 0 14px}
+.bubble{background:#fff;border:3px solid var(--teal);border-radius:22px;padding:10px 18px;font-weight:900;min-height:56px;display:flex;align-items:center}
+.bubble.b{border-color:var(--sun)}
+
+.overlay{position:fixed;inset:0;background:rgba(5,30,30,.5);display:none;place-items:center;z-index:80}
+.overlay.on{display:grid}
+.obox{background:var(--surface);border-radius:28px;padding:34px 44px;text-align:center;max-width:90vw;animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+.obox .big{font-family:var(--display);font-size:clamp(40px,6vw,76px);color:var(--teal);line-height:1}
+.obox p{font-size:1.2em;margin:12px 0 20px}
+.confetti{position:fixed;top:-20px;width:12px;height:18px;z-index:90;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+@media (max-width:1100px){ .match,.two{grid-template-columns:1fr} .chips{grid-template-columns:repeat(4,1fr)} .song{grid-template-columns:1fr} .photos{grid-template-columns:1fr 1fr} }
+@media (max-width:640px){ .chips{grid-template-columns:1fr 1fr} }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>🩺 What's the <span>matter?</span></h1>
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-go="s1"><span class="n">1</span>Look!</button>
+    <button class="tab" role="tab" aria-selected="false" data-go="s2"><span class="n">2</span>Song</button>
+    <button class="tab" role="tab" aria-selected="false" data-go="s3"><span class="n">3</span>First aid</button>
+    <button class="tab" role="tab" aria-selected="false" data-go="s4"><span class="n">4</span>Listen</button>
+    <button class="tab" role="tab" aria-selected="false" data-go="s5"><span class="n">5</span>Team time</button>
+  </nav>
+  <div class="stars" aria-live="polite">⭐ <span id="stars">0</span></div>
+  <button class="iconbtn" id="fs" title="Full screen" aria-label="Full screen">⛶</button>
+</header>
+
+<main>
+<!-- 1 LOOK -->
+<section id="s1" class="on">
+  <div class="instr">
+    <h2>Look! What can you see?</h2>
+    <p>Tap a word 👉 then tap the number. Or drag it! Tap a label to listen and say. 🔊</p>
+  </div>
+  <div class="match">
+    <div class="scene" id="scene">
+      <img src="media/clinic.jpg" alt="A busy clinic. Children and adults have different health problems. Numbers 1 to 12 point to them.">
+    </div>
+    <aside class="bank">
+      <h3>Health problems</h3>
+      <div class="chips" id="chips"></div>
+      <button class="pill" id="listenAll">🔊 Listen, point, and say</button>
+      <button class="pill" id="resetMatch">↺ Start again</button>
+    </aside>
+  </div>
+</section>
+
+<!-- 2 SONG -->
+<section id="s2">
+  <div class="instr">
+    <h2>🎵 Achoo! — Listen, move, and sing</h2>
+    <p>Complete the song. Tap the word for the <b style="color:var(--coral)">flashing</b> gap.</p>
+  </div>
+  <div class="song" id="song"></div>
+  <div class="songbank" id="songbank"></div>
+  <div class="row" style="margin-top:16px">
+    <button class="pill sun" id="sing">🎤 Sing along</button>
+    <button class="pill" id="resetSong">↺ Start again</button>
+  </div>
+</section>
+
+<!-- 3 DIALOGUE -->
+<section id="s3">
+  <div class="instr">
+    <h2>Listen and read</h2>
+    <p>Tap a name to listen. 🔊</p>
+  </div>
+  <div class="two">
+    <div class="panel">
+      <h3>At the clinic</h3>
+      <div class="dialog" id="dialog"></div>
+      <div class="row" style="margin-top:12px;justify-content:flex-start">
+        <button class="pill primary" id="playAll">▶ Listen to all</button>
+        <button class="pill sun" id="hunt">⭕ Circle <i>have</i> and <i>feel</i> <span class="counter" id="huntCount"></span></button>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Why are the children learning first aid?</h3>
+      <div class="mc" id="mcWhy"></div>
+      <div class="gbox">
+        <div class="h"><i>have</i> and <i>feel</i></div>
+        <div class="gtable">
+          <div class="k">I · you · we · they</div><div class="k">he · she · it</div>
+          <div>I <b>have</b> an earache.</div><div>She <b>has</b> a cut.</div>
+          <div>They <b>feel</b> sick.</div><div>He <b>feels</b> dizzy.</div>
+        </div>
+      </div>
+      <p class="hint" style="margin-top:10px">💡 <b>have</b> + a problem (a headache, a cold…) · <b>feel</b> + sick / dizzy</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 LISTEN & NUMBER -->
+<section id="s4">
+  <div class="instr">
+    <h2>Listen and number. Then choose the correct word.</h2>
+    <p>Tap 🔊, listen, and tap the right picture.</p>
+  </div>
+  <div class="row"><button class="pill primary" id="playN">🔊 Listen</button><button class="pill" id="resetN">↺ Start again</button></div>
+  <div class="nowplay" id="nowplay">Tap “Listen” to start.</div>
+  <div class="photos" id="photos"></div>
+</section>
+
+<!-- 5 TEAM TIME -->
+<section id="s5">
+  <div class="instr">
+    <h2>👥 Team time — Mime and guess!</h2>
+    <p>One student looks at the card and mimes. The team guesses. You can also <b>draw</b> it! ✏️</p>
+  </div>
+  <div class="teams">
+    <div class="team" style="--c:var(--teal)">🟢 Team A <span class="sc" id="scA">0</span><button class="plus" data-t="A" aria-label="Point for Team A">+</button></div>
+    <div class="team" style="--c:var(--coral)">🟠 Team B <span class="sc" id="scB">0</span><button class="plus" data-t="B" aria-label="Point for Team B">+</button></div>
+  </div>
+  <div class="mime">
+    <div class="card hidden" id="card"><div class="emo" id="cEmo"></div><div class="word" id="cWord"></div></div>
+    <div class="bubbles">
+      <div class="bubble">🙋 What's the matter with me?</div>
+      <div class="bubble b" id="ansBubble">🗣️ You …</div>
+    </div>
+    <div class="row">
+      <button class="pill sun" id="peek">👀 Show / hide card</button>
+      <button class="pill" id="sayAns">🔊 Answer</button>
+      <button class="pill primary" id="newCard">🔀 New card</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="overlay" id="ov"><div class="obox"><div class="big" id="ovBig"></div><p id="ovTxt"></p><button class="pill primary" id="ovClose">OK ✔</button></div></div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+let stars=0; const addStar=(n=1)=>{stars+=n;$('#stars').textContent=stars};
+let ac; function tone(fs,dur=.12,type='sine',vol=.15){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();let t=ac.currentTime;fs.forEach(f=>{const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+dur);t+=dur*.9})}catch(e){}}
+const good=()=>tone([660,880,1100],.11,'triangle'), bad=()=>tone([220,180],.16,'square',.07);
+let voices=[];
+function loadVoices(){voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang))}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+function pick(kind){const us=voices.filter(v=>/en-US/i.test(v.lang));const pool=us.length?us:voices;
+  const f=pool.find(v=>/female|zira|jenny|aria|samantha|google us/i.test(v.name)), m=pool.find(v=>/male|david|guy|mark|davis/i.test(v.name)&&!/female/i.test(v.name));
+  return kind==='m'?(m||pool[0]):(f||pool[0])}
+function speak(text,rate=.85,onend,kind){if(!('speechSynthesis' in window)){onend&&onend();return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='en-US';const v=pick(kind);if(v)u.voice=v;u.rate=rate;if(onend)u.onend=onend;speechSynthesis.speak(u)}
+function confetti(){const cs=['#0E7C7B','#F6B93B','#E4572E','#2D5FB8','#1F7A3A'];for(let i=0;i<70;i++){const d=document.createElement('div');d.className='confetti';d.style.left=Math.random()*100+'vw';d.style.background=cs[i%5];d.style.animationDuration=(1.8+Math.random()*1.8)+'s';d.style.animationDelay=Math.random()*.5+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),4200)}tone([523,659,784,1046],.16,'triangle')}
+function overlay(big,txt){$('#ovBig').textContent=big;$('#ovTxt').textContent=txt;$('#ov').classList.add('on');confetti()}
+$('#ovClose').onclick=()=>$('#ov').classList.remove('on');
+$$('.tab').forEach(t=>t.onclick=()=>{$$('.tab').forEach(x=>x.setAttribute('aria-selected',x===t));$$('section').forEach(s=>s.classList.toggle('on',s.id===t.dataset.go));$('main').scrollTop=0;window.speechSynthesis&&speechSynthesis.cancel()});
+$('#fs').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{})};
+document.addEventListener('contextmenu',e=>e.preventDefault());
+
+function tapOrDrag(item,{onPick,getTarget,onDrop,onHover}){
+  item.addEventListener('pointerdown',e=>{
+    const sx=e.clientX,sy=e.clientY;let ghost=null,last=null;item.setPointerCapture(e.pointerId);
+    const move=ev=>{if(!ghost&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>12){ghost=item.cloneNode(true);ghost.classList.add('ghost');ghost.style.width=item.offsetWidth+'px';document.body.appendChild(ghost);onPick(item,true)}
+      if(ghost){ghost.style.left=ev.clientX+'px';ghost.style.top=ev.clientY+'px';const t=getTarget(ev.clientX,ev.clientY);if(t!==last){onHover&&onHover(last,false);onHover&&onHover(t,true);last=t}}};
+    const up=ev=>{item.removeEventListener('pointermove',move);item.removeEventListener('pointerup',up);item.removeEventListener('pointercancel',up);
+      if(ghost){ghost.remove();onHover&&onHover(last,false);const t=getTarget(ev.clientX,ev.clientY);if(t)onDrop(item,t)}else onPick(item,false)};
+    item.addEventListener('pointermove',move);item.addEventListener('pointerup',up);item.addEventListener('pointercancel',up);
+  });
+}
+function targetAt(x,y,sel){for(const el of document.elementsFromPoint(x,y)){const t=el.closest&&el.closest(sel);if(t)return t}return null}
+
+/* ===== 1 LOOK ===== */
+const PROBS=[ // n, word, emoji, label box on 718x372 image [x0,y0,x1,y1], number width, answer phrase
+ [1,'flu','🤧',[28,15,78,38],21,'You have the flu.'],
+ [2,'headache','🤕',[52,56,150,80],21,'You have a headache.'],
+ [3,'sore throat','😣',[250,60,352,82],21,'You have a sore throat.'],
+ [4,'dizzy','😵‍💫',[362,20,428,42],21,'You feel dizzy.'],
+ [5,'temperature','🤒',[512,22,622,46],21,'You have a temperature.'],
+ [6,'sick','🤢',[183,142,238,165],21,'You feel sick.'],
+ [7,'stomachache','😖',[163,187,282,210],21,'You have a stomachache.'],
+ [8,'cold','🥶',[317,135,374,158],21,'You have a cold.'],
+ [9,'broken arm','🦴',[428,150,533,173],21,'You have a broken arm.'],
+ [10,'earache','👂',[130,244,222,267],28,'You have an earache.'],
+ [11,'cough','😷',[316,232,392,255],28,'You have a cough.'],
+ [12,'cut','🩹',[510,264,566,287],28,'You have a cut.']];
+const W=718,H=372;
+let selChip=null,matched=0;
+function buildMatch(){
+  const sc=$('#scene');sc.querySelectorAll('.zone').forEach(z=>z.remove());
+  PROBS.forEach(([n,w,e,[x0,y0,x1,y1],nw])=>{const z=document.createElement('button');z.className='zone';z.dataset.w=w;z.setAttribute('aria-label','Number '+n);
+    Object.assign(z.style,{left:x0/W*100+'%',top:y0/H*100+'%',width:(x1-x0)/W*100+'%',height:(y1-y0)/H*100+'%'});z.style.setProperty('--nw',(nw/(x1-x0)*100)+'%');
+    z.innerHTML='<span class="tag">'+w+'</span>';
+    z.onclick=()=>{if(z.classList.contains('done')){speak(w);return}if(selChip)tryMatch(selChip,z);else{z.classList.add('wrong');setTimeout(()=>z.classList.remove('wrong'),450)}};sc.appendChild(z)});
+  const box=$('#chips');box.innerHTML='';
+  shuffle(PROBS).forEach(([n,w,e])=>{const c=document.createElement('button');c.className='chip';c.dataset.w=w;c.innerHTML='<span class="e">'+e+'</span>'+w;box.appendChild(c);
+    tapOrDrag(c,{onPick:(it,drag)=>{if(!drag&&selChip===it){unsel();return}unsel();selChip=it;it.classList.add('sel');$('#scene').classList.add('picking');speak(w)},
+      getTarget:(x,y)=>{const t=targetAt(x,y,'.zone');return t&&!t.classList.contains('done')?t:null},onDrop:tryMatch,onHover:(t,on)=>t&&t.classList.toggle('hover',on)})});
+  matched=0;unsel();
+}
+function unsel(){if(selChip)selChip.classList.remove('sel');selChip=null;$('#scene').classList.remove('picking')}
+function tryMatch(c,z){
+  if(c.dataset.w===z.dataset.w){z.classList.add('done');c.classList.add('gone');unsel();good();setTimeout(()=>speak(z.dataset.w),250);addStar();
+    if(++matched===12)setTimeout(()=>overlay('Great job! 🩺','You know 12 health problems!'),700)}
+  else{bad();z.classList.add('wrong');c.classList.add('shake');setTimeout(()=>{z.classList.remove('wrong');c.classList.remove('shake')},450)}
+}
+$('#resetMatch').onclick=buildMatch;
+$('#listenAll').onclick=()=>{let i=0;const next=()=>{if(i>=PROBS.length)return;const [n,w]=PROBS[i++];speak('Number '+n+'. '+w,.8,()=>setTimeout(next,900))};next()};
+buildMatch();
+
+/* ===== 2 SONG ===== */
+const V1=["I'm not feeling well.","I'm not OK.","I'm very tired.","Can I stay at home today?"];
+const V2=["[Earache], a [sore throat],","A [temperature], too.","A [headache], a [stomachache].","Maybe it's the [flu]?","A [cough], a [cold],","A [dizzy] head, too.","Achoo! Achoo! Achoo!"];
+const V3=["You're not feeling well.","You're not OK.","Stay in bed.","No school for you today!"];
+let gapIdx=0,gaps=[];
+function buildSong(){
+  const mk=(title,lines,cls)=>'<div class="verse '+cls+'"><h4>'+title+'</h4>'+lines.map(l=>'<span class="lyr">'+l.replace(/\[([^\]]+)\]/g,(m,w)=>'<span class="gap" data-w="'+w.toLowerCase()+'">'+w+'</span>')+'</span>').join('')+'</div>';
+  $('#song').innerHTML=mk('Verse 1 👦',V1,'')+mk('Chorus 🤧',V2,'mid')+mk('Verse 2 👩',V3,'');
+  gaps=$$('#song .gap');gapIdx=0;gaps.forEach(g=>g.className='gap');gaps[0].classList.add('next');
+  const words=[...new Set(gaps.map(g=>g.dataset.w))];
+  $('#songbank').innerHTML='';shuffle(words).forEach(w=>{const b=document.createElement('button');b.className='chip';b.textContent=w;b.onclick=()=>fillGap(b,w);$('#songbank').appendChild(b)});
+}
+function fillGap(b,w){
+  if(gapIdx>=gaps.length)return;const g=gaps[gapIdx];
+  if(g.dataset.w===w){g.className='gap ok';good();speak(w);addStar();b.classList.add('gone');gapIdx++;
+    if(gapIdx<gaps.length)gaps[gapIdx].classList.add('next');else setTimeout(()=>overlay('Achoo! 🤧','Song complete! Now sing it!'),500)}
+  else{bad();b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),450)}
+}
+$('#sing').onclick=()=>{const ls=$$('#song .lyr');let i=0;const next=()=>{ls.forEach(l=>l.classList.remove('now'));if(i>=ls.length)return;const l=ls[i++];l.classList.add('now');speak(l.textContent,.9,()=>setTimeout(next,150))};next()};
+$('#resetSong').onclick=buildSong;
+buildSong();
+
+/* ===== 3 DIALOGUE ===== */
+const DIA=[
+ ['Emma','f',"Hello, Mia. I'm at the clinic. I'm going to see the doctor."],
+ ['Mia','f',"Oh, no! What's the matter?"],
+ ['Emma','f',"I [have] a headache and I [feel] sick."],
+ ['Mia','f',"Oh, I'm sorry. We're at the clinic, too! We're learning first aid so that we can help at the Fun Run on Saturday."],
+ ['Emma','f',"What's first aid?"],
+ ['Mia','f',"We're learning to help when somebody falls down and [has] a cut or a broken arm."],
+ ['Liam','m',"Hey, Emma. Tell Mia to stop moving her finger!"],
+ ['Mia','f',"Sorry, Liam! Bye, Emma. Get well soon."]];
+const COL={Emma:'var(--coral)',Mia:'var(--teal)',Liam:'var(--blue)'};
+let hunting=false,found=0;const TARGETS=DIA.reduce((n,d)=>n+(d[2].match(/\[/g)||[]).length,0);
+DIA.forEach(([who,k,txt])=>{const d=document.createElement('div');d.className='line';d.style.setProperty('--c',COL[who]);
+  const words=txt.split(' ').map(t=>{const hit=/^\[/.test(t);const clean=t.replace(/[\[\]]/g,'');return '<span class="w"'+(hit?' data-t="1"':'')+'>'+clean+'</span>'}).join(' ');
+  d.innerHTML='<button class="who">🔊 '+who+':</button><span class="txt">'+words+'</span>';
+  d.querySelector('.who').onclick=()=>playLine(d,()=>{});
+  d.dataset.k=k;d.dataset.say=txt.replace(/[\[\]]/g,'');$('#dialog').appendChild(d)});
+function playLine(d,cb){$$('.line').forEach(x=>x.classList.remove('playing'));d.classList.add('playing');speak(d.dataset.say,.85,()=>{d.classList.remove('playing');cb&&cb()},d.dataset.k)}
+$('#playAll').onclick=()=>{const ls=$$('.line');let i=0;const next=()=>{if(i<ls.length)playLine(ls[i++],()=>setTimeout(next,300))};next()};
+$('#hunt').onclick=()=>{hunting=!hunting;$('#dialog').classList.toggle('hunting',hunting);$('#huntCount').textContent=hunting?found+'/'+TARGETS:''};
+$('#dialog').addEventListener('click',e=>{const w=e.target.closest('.w');if(!w||!hunting||w.classList.contains('found'))return;
+  if(w.dataset.t){w.classList.add('found');good();addStar();found++;$('#huntCount').textContent=found+'/'+TARGETS;speak(w.textContent.replace(/\W/g,''));if(found===TARGETS)setTimeout(()=>overlay('Well done! ⭕','have · feel · has'),500)}
+  else{w.classList.add('nope');bad();setTimeout(()=>w.classList.remove('nope'),500)}});
+[['So they can help at the Fun Run on Saturday. 🏃',true],['Because they have the flu. 🤧',false],['Because they want to be doctors. 🩺',false]].sort(()=>Math.random()-.5).forEach(([t,ok])=>{
+  const b=document.createElement('button');b.className='opt';b.textContent=t;b.onclick=()=>{if(ok){b.classList.add('ok');good();addStar();$$('#mcWhy .opt').forEach(x=>x.disabled=true)}else{b.classList.add('no');b.disabled=true;bad()}};$('#mcWhy').appendChild(b)});
+
+/* ===== 4 LISTEN & NUMBER ===== */
+const PH=[ // letter, img, subject, [opt1,opt2], correct, rest, audio
+ ['a','photo1.jpg','He',['has','feels'],'has','a broken arm.','Look at Tom. He has a broken arm. He fell off his bike.'],
+ ['b','photo2.jpg','She',['has','feels'],'feels','sick.','This is Anna. She feels sick. She is in bed today.'],
+ ['c','photo3.jpg','I',['have','feel an'],'have','an earache.','Ouch! My ear hurts. I have an earache.'],
+ ['d','photo4.jpg','We',['have','has a'],'have','a stomachache.','We ate too much cake! We have a stomachache.']];
+let order=[],step=0;
+function buildN(){
+  order=shuffle([0,1,2,3]);step=0;$('#nowplay').textContent='Tap “Listen” to start.';
+  $('#photos').innerHTML='';PH.forEach(([l,img,sub,opts,cor,rest],i)=>{const c=document.createElement('div');c.className='photo-card lock';c.dataset.i=i;
+    c.innerHTML='<div class="badge"></div><img src="media/'+img+'" alt=""><div class="let">'+l+'</div><div class="sent">'+sub+' <span class="ch">___</span> '+rest+'</div><div class="btns"></div>';
+    opts.forEach(o=>{const b=document.createElement('button');b.className='opt';b.textContent=o;b.onclick=ev=>{ev.stopPropagation();
+      if(o.split(' ')[0]===cor){b.classList.add('ok');c.querySelector('.ch').textContent=cor;c.querySelectorAll('.btns .opt').forEach(x=>x.disabled=true);good();addStar();speak(sub+' '+cor+' '+rest);checkAllN()}else{b.classList.add('no');b.disabled=true;bad()}};c.querySelector('.btns').appendChild(b)});
+    c.onclick=()=>tapPhoto(c,i);$('#photos').appendChild(c)});
+}
+function playN(){if(step>=4){$('#nowplay').textContent='All numbered! Now choose the correct words. ✔';return}$('#nowplay').textContent='🔊 Number '+(step+1)+'… which picture?';speak('Number '+(step+1)+'. '+PH[order[step]][6],.85)}
+function tapPhoto(c,i){if(c.classList.contains('ok'))return;if(step>=4)return;
+  if(i===order[step]){c.classList.add('ok');c.classList.remove('lock');c.querySelector('.badge').textContent=step+1;good();addStar();step++;setTimeout(playN,900)}
+  else{bad();c.classList.add('shake');setTimeout(()=>c.classList.remove('shake'),450)}}
+function checkAllN(){if($$('#photos .ch').every(x=>x.textContent!=='___'))setTimeout(()=>overlay('Super! 🎧','He has… · She feels… · I have… · We have…'),500)}
+$('#playN').onclick=playN;$('#resetN').onclick=buildN;
+buildN();
+
+/* ===== 5 TEAM TIME ===== */
+let deck=[],cur=null,score={A:0,B:0};
+function newCard(){if(!deck.length)deck=shuffle(PROBS);cur=deck.pop();$('#cEmo').textContent=cur[2];$('#cWord').textContent=cur[1];$('#card').classList.add('hidden');$('#ansBubble').textContent='🗣️ You …'}
+$('#newCard').onclick=newCard;
+$('#peek').onclick=()=>$('#card').classList.toggle('hidden');
+$('#sayAns').onclick=()=>{$('#ansBubble').textContent='🗣️ '+cur[5];speak(cur[5])};
+$$('.plus').forEach(b=>b.onclick=()=>{const t=b.dataset.t;score[t]++;$('#sc'+t).textContent=score[t];good();newCard()});
+newCard();
+</script>
+</body>
+</html>
