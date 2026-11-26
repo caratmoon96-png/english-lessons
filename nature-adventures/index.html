@@ -1,0 +1,549 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></head><body>
+<title>Nature Adventures</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: a hiking trail. Each section is a numbered trail stop with a wooden marker; photo cards and large touch targets for 10–11 year olds. Blue = action in progress, orange = event. */
+:root{
+  --bg:#F3F5EF; --surface:#FFFFFF; --surface-2:#E7ECDF; --ink:#1A2418; --ink-soft:#4B5947; --line:#CBD5C2;
+  --wood:#5B3A1E; --wood-ink:#FBEFD9; --forest:#2E6B3F; --forest-ink:#FFFFFF; --pg:#1D6FD1; --sp:#C2410C; --sun:#F2B134;
+  --good:#1F7A3A; --good-bg:#DDF2E3; --bad:#B3261E; --bad-bg:#FBE3E1;
+  --display:'Bricolage Grotesque','Trebuchet MS',sans-serif; --body:'Atkinson Hyperlegible',Verdana,sans-serif; --r:16px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0F140E; --surface:#182016; --surface-2:#222C1F; --ink:#EEF3EA; --ink-soft:#AFBCA9; --line:#334030;
+  --wood:#3A2513; --forest:#6BC488; --forest-ink:#0F140E; --pg:#7DB5FF; --sp:#FF9A5C;
+  --good:#7FD99A; --good-bg:#183A26; --bad:#FF9C94; --bad-bg:#43201E; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F140E; --surface:#182016; --surface-2:#222C1F; --ink:#EEF3EA; --ink-soft:#AFBCA9; --line:#334030;
+  --wood:#3A2513; --forest:#6BC488; --forest-ink:#0F140E; --pg:#7DB5FF; --sp:#FF9A5C;
+  --good:#7FD99A; --good-bg:#183A26; --bad:#FF9C94; --bad-bg:#43201E; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--wood)}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.1;margin:0}
+p{margin:0}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+img{display:block}
+
+nav.trail{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--wood)}
+nav.trail .wrap{display:flex;gap:6px;overflow-x:auto;padding-block:10px;scrollbar-width:thin}
+nav.trail a{flex:none;text-decoration:none;color:var(--wood-ink);font-weight:700;font-size:14px;padding:6px 12px;border-radius:8px;border:1px solid rgba(251,239,217,.3);white-space:nowrap;font-family:var(--display)}
+nav.trail a:hover{background:rgba(251,239,217,.12)}
+
+.hero{position:relative;background:#1A2418}
+.hero img{width:100%;height:clamp(260px,42vw,440px);object-fit:cover;opacity:.85}
+.hero .over{position:absolute;inset:0;display:flex;align-items:flex-end;background:linear-gradient(to top,rgba(10,16,9,.88),rgba(10,16,9,0) 62%)}
+.hero .over .wrap{width:100%;padding-block:28px}
+.hero .badge{display:inline-flex;gap:8px;align-items:center;background:var(--sun);color:#2A1B00;font-family:var(--display);font-weight:800;padding:6px 12px;border-radius:8px;font-size:15px;letter-spacing:.05em}
+.hero h1{font-size:clamp(48px,9vw,96px);font-weight:800;letter-spacing:-.02em;margin-top:10px;color:#fff}
+.hero p{font-size:20px;max-width:48ch;color:#EEF3EA}
+
+section.stop{padding-block:36px}
+.marker{display:flex;flex-wrap:wrap;align-items:center;gap:14px;background:var(--wood);color:var(--wood-ink);border-radius:14px 14px 14px 4px;padding:14px 20px;margin-bottom:18px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
+.marker .no{font-family:var(--display);font-weight:800;font-size:15px;background:var(--wood-ink);color:var(--wood);border-radius:999px;padding:4px 12px;letter-spacing:.06em}
+.marker h2{font-size:clamp(26px,4vw,36px);font-weight:800;flex:1 1 260px;color:var(--wood-ink)}
+.marker .ico{font-size:30px}
+.how{color:var(--ink-soft);max-width:66ch}
+.es{color:var(--ink-soft);font-size:15px}
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.block{display:flex;flex-direction:column;gap:12px;margin-top:28px}
+.block h3{font-size:26px;font-weight:800}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-weight:700}
+.tab[aria-pressed="true"]{background:var(--forest);border-color:var(--forest);color:var(--forest-ink)}
+.vcard{padding:0;overflow:hidden}
+.vcard img{width:100%;aspect-ratio:3/2;object-fit:cover;max-width:100%}
+.vcard .in{padding:12px 16px 16px;display:flex;flex-direction:column;gap:6px}
+.vcard .w{font-family:var(--display);font-size:26px;font-weight:800}
+.vcard .kind{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--forest)}
+.play{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:999px;background:var(--forest);color:var(--forest-ink);font-weight:700;padding:8px 16px;align-self:flex-start}
+.play.sm{padding:5px 12px;font-size:15px}
+.play.on{background:var(--sun);color:#2A1B00}
+.btn{border:2px solid var(--ink);background:transparent;border-radius:12px;padding:9px 18px;font-weight:700}
+.btn.solid{background:var(--wood);border-color:var(--wood);color:var(--wood-ink)}
+.score{font-family:var(--display);font-weight:800;font-size:20px;padding:6px 14px;border-radius:999px;background:var(--forest);color:var(--forest-ink);white-space:nowrap}
+.fb{font-weight:700;min-height:1.5em}
+.fb.good{color:var(--good)} .fb.bad{color:var(--bad)}
+.opt{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 16px;font-weight:700;text-align:left}
+.opt:hover:not(:disabled){border-color:var(--forest)}
+.opt.right{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.opt:disabled{cursor:default}
+.game{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:14px}
+.pics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.pics.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.pic{border:4px solid transparent;border-radius:14px;padding:0;background:var(--surface-2);overflow:hidden;position:relative}
+.pic img{width:100%;aspect-ratio:3/2;object-fit:cover}
+.pic span{position:absolute;left:6px;bottom:6px;background:rgba(10,16,9,.8);color:#fff;font-weight:700;font-size:14px;padding:2px 8px;border-radius:6px}
+.pic:hover:not(:disabled){border-color:var(--forest)}
+.pic.right{border-color:var(--good)} .pic.wrong{border-color:var(--bad);opacity:.55}
+.bigq{font-family:var(--display);font-size:clamp(23px,3.4vw,30px);font-weight:800}
+.memory{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.mc{aspect-ratio:4/3;border:none;border-radius:12px;background:var(--wood);color:var(--wood-ink);font-family:var(--display);font-weight:800;font-size:clamp(14px,2.2vw,20px);padding:6px;display:grid;place-items:center;overflow:hidden;text-align:center}
+.mc img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.mc.up{background:var(--surface);color:var(--ink);border:2px solid var(--line)}
+.mc.got{background:var(--good-bg);color:var(--good);border:2px solid var(--good)}
+.bubble{position:relative;background:var(--surface);border:2px solid var(--forest);border-radius:18px 18px 18px 4px;padding:14px 18px;font-family:var(--display);font-weight:700;font-size:22px}
+.label{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--forest)}
+.ex{font-family:var(--display);font-size:23px;font-weight:700}
+.pg{color:var(--pg);font-weight:700} .sp{color:var(--sp);font-weight:700}
+.formula{font-family:var(--display);font-weight:800;font-size:clamp(19px,2.8vw,24px);background:var(--surface-2);padding:12px 16px;border-radius:12px}
+.items{display:flex;flex-direction:column;gap:10px}
+.item{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.item .t{font-family:var(--display);font-size:21px;font-weight:700;flex:1 1 300px;min-width:0}
+.item .blank{display:inline-block;min-width:4em;border-bottom:3px solid var(--forest);text-align:center;color:var(--forest)}
+.item.good{border-color:var(--good);background:var(--good-bg)}
+.tl{position:relative;height:150px;margin-top:6px}
+.tl .axis{position:absolute;left:0;right:0;top:74px;height:4px;background:var(--line);border-radius:2px}
+.tl .bar{position:absolute;left:6%;width:76%;top:62px;height:28px;border-radius:14px;background:var(--pg)}
+.tl .zap{position:absolute;left:52%;top:40px;font-size:56px;line-height:1;transform:translateX(-50%)}
+.tl .t1{position:absolute;left:6%;top:14px;font-weight:700;color:var(--pg);max-width:45%}
+.tl .t2{position:absolute;left:46%;top:104px;font-weight:700;color:var(--sp)}
+.tl .t0{position:absolute;left:6%;top:104px;font-size:15px;color:var(--ink-soft)}
+.tl .now{position:absolute;right:0;top:60px;background:var(--wood);color:var(--wood-ink);font-weight:800;font-family:var(--display);padding:4px 8px;border-radius:6px;font-size:14px}
+.story{font-size:20px;line-height:1.85;max-width:66ch;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.story .v{border-radius:4px;transition:background .2s}
+.story.show .v.p{background:color-mix(in srgb,var(--pg) 22%,transparent);color:var(--pg);font-weight:700}
+.story.show .v.s{background:color-mix(in srgb,var(--sp) 22%,transparent);color:var(--sp);font-weight:700}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-weight:700;font-size:15px}
+.maker{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.maker label{display:flex;flex-direction:column;gap:6px;font-weight:700}
+.maker select{padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--surface);font-size:17px}
+.out{display:flex;flex-direction:column;gap:10px}
+.out p{font-family:var(--display);font-size:clamp(21px,3vw,26px);font-weight:700;padding:14px 16px;border-radius:12px;background:var(--surface-2)}
+.out small{display:block;font-family:var(--body);font-weight:400;font-size:14px;color:var(--ink-soft);margin-bottom:4px}
+.cluecards .card.pick{border:3px solid var(--sun);box-shadow:0 0 0 4px color-mix(in srgb,var(--sun) 35%,transparent)}
+footer{padding-block:28px 48px;color:var(--ink-soft);font-size:14px;border-top:1px solid var(--line)}
+@media (max-width:640px){ .pics{grid-template-columns:repeat(2,minmax(0,1fr))} .pics.three{grid-template-columns:repeat(3,minmax(0,1fr))} .memory{grid-template-columns:repeat(3,minmax(0,1fr))} .tl .t1,.tl .t2{font-size:15px} }
+@media (prefers-reduced-motion: reduce){ .story .v{transition:none} }
+</style>
+
+<nav class="trail" aria-label="Sections"><div class="wrap">
+  <a href="#words">Stop 1 · Words</a><a href="#games">Stop 2 · Games</a><a href="#guess">Stop 3 · Guess the place</a>
+  <a href="#prog">Stop 4 · Past progressive</a><a href="#past">Stop 5 · Simple past</a><a href="#when">Stop 6 · When</a><a href="#story">Stop 7 · Leo’s adventure</a><a href="#make">Stop 8 · My adventure</a>
+</div></nav>
+
+<header class="hero">
+  <img src="media/image6.jpg" alt="A deep canyon with red rocky sides and a river">
+  <div class="over"><div class="wrap">
+    <span class="badge">🥾 LEARNING WELL 5 · UNIT 1</span>
+    <h1>Nature adventures</h1>
+    <p>Learn words for places in nature, then tell adventure stories with the past progressive and the simple past.</p>
+  </div></div>
+</header>
+
+<main>
+<section class="stop" id="words"><div class="wrap">
+  <div class="marker"><span class="no">STOP 1</span><h2>Nature words</h2><span class="ico" aria-hidden="true">🌋</span></div>
+  <p class="how">Look at the photos. Say each word. Press ▶ to listen. <span class="es">Mira las fotos, escucha y repite cada palabra.</span></p>
+  <div class="tabs" id="groupTabs" style="margin-top:14px"></div>
+  <div class="grid g3" id="vocabGrid" style="margin-top:14px"></div>
+</div></section>
+
+<section class="stop" id="games"><div class="wrap">
+  <div class="marker"><span class="no">STOP 2</span><h2>Word games</h2><span class="ico" aria-hidden="true">🎯</span></div>
+  <div class="block" style="margin-top:0">
+    <div class="row" style="justify-content:space-between"><h3>Explorer questions</h3><span class="score" id="eqScore">0 / 6</span></div>
+    <p class="how">Read the question. Click the right photo. <span class="es">Lee la pregunta y elige la foto correcta.</span></p>
+    <div class="items" id="eqList"></div>
+  </div>
+  <div class="block">
+    <div class="row" style="justify-content:space-between"><h3>Listen and click</h3><span class="score" id="lcScore">0 / 10</span></div>
+    <p class="how">Listen to the word. Click the right photo. <span class="es">Escucha y haz clic en la foto.</span></p>
+    <div class="game"><div class="row"><button class="play" id="lcPlay">▶ Listen</button><span class="fb" id="lcFb"></span></div><div class="pics" id="lcPics"></div><div class="row"><button class="btn solid" id="lcNext" hidden>Next ›</button></div></div>
+  </div>
+  <div class="block">
+    <div class="row" style="justify-content:space-between"><h3>Read the meaning</h3><span class="score" id="rmScore">0 / 18</span></div>
+    <p class="how">Read the meaning. Choose the word. <span class="es">Lee el significado y elige la palabra.</span></p>
+    <div class="game"><p class="bigq" id="rmQ"></p><div class="row" id="rmOpts"></div><div class="row"><span class="fb" id="rmFb"></span><button class="btn solid" id="rmNext" hidden>Next ›</button></div></div>
+  </div>
+  <div class="block">
+    <div class="row" style="justify-content:space-between"><h3>Memory game</h3><span class="score" id="mmScore">0 / 6 pairs</span></div>
+    <p class="how">Find each photo and its word. <span class="es">Encuentra los pares: foto y palabra.</span></p>
+    <div class="memory" id="memory"></div>
+    <div class="row"><button class="btn" id="mmNew">New game</button></div>
+  </div>
+</div></section>
+
+<section class="stop" id="guess"><div class="wrap">
+  <div class="marker"><span class="no">STOP 3</span><h2>What place am I describing?</h2><span class="ico" aria-hidden="true">🔎</span></div>
+  <div class="g2 grid">
+    <div class="card"><span class="label">Partner A</span><p class="bubble">It’s underwater. Fish can live there.</p><span class="label">Partner B</span><p class="bubble" style="border-color:var(--wood)">Is it a coral reef?</p><button class="play sm" data-say="It's underwater. Fish can live there. Is it a coral reef?">▶ Listen</button></div>
+    <div class="game">
+      <div class="row" style="justify-content:space-between"><h3 style="font-size:22px">Guess with the computer</h3><span class="score" id="gsScore">0 / 8</span></div>
+      <p class="bigq" id="gsClue"></p>
+      <div class="row"><button class="play sm" id="gsSay">▶ Listen to the clue</button></div>
+      <div class="pics three" id="gsPics"></div>
+      <div class="row"><span class="fb" id="gsFb"></span><button class="btn solid" id="gsNext" hidden>Next ›</button></div>
+    </div>
+  </div>
+  <div class="block">
+    <h3>Now with a partner</h3>
+    <p class="how">Partner A picks a card and reads the clue. Partner B asks “Is it a…?”. Then change roles. <span class="es">Uno lee la pista y el otro adivina con “Is it a…?”.</span></p>
+    <div class="row"><button class="btn solid" id="pickClue">🎲 Pick a card for Partner A</button></div>
+    <div class="grid g3 cluecards" id="clueCards"></div>
+  </div>
+</div></section>
+
+<section class="stop" id="prog"><div class="wrap">
+  <div class="marker"><span class="no">STOP 4</span><h2>Past progressive</h2><span class="ico" aria-hidden="true">〰️</span></div>
+  <p class="how">An action <span class="pg">was already happening</span> at a time in the past. <span class="es">Una acción que estaba pasando en un momento del pasado.</span></p>
+  <div class="block" style="margin-top:14px"><div class="tabs" id="pgTabs"></div><div id="pgForm"></div></div>
+  <div class="block">
+    <div class="row" style="justify-content:space-between"><h3>Was or were?</h3><span class="score" id="wwScore">0 / 6</span></div>
+    <div class="items" id="wwList"></div>
+  </div>
+</div></section>
+
+<section class="stop" id="past"><div class="wrap">
+  <div class="marker"><span class="no">STOP 5</span><h2>Simple past</h2><span class="ico" aria-hidden="true">✔️</span></div>
+  <p class="how">Use it for a <span class="sp">finished action or event</span> in the past. <span class="es">Para acciones o eventos terminados.</span></p>
+  <div class="block" style="margin-top:14px"><div class="tabs" id="spTabs"></div><div id="spForm"></div></div>
+  <div class="block">
+    <div class="row" style="justify-content:space-between"><h3>Choose the right form</h3><span class="score" id="spScore">0 / 6</span></div>
+    <div class="items" id="spList"></div>
+  </div>
+</div></section>
+
+<section class="stop" id="when"><div class="wrap">
+  <div class="marker"><span class="no">STOP 6</span><h2>Two past actions with when</h2><span class="ico" aria-hidden="true">⚡</span></div>
+  <p class="how">One action was <span class="pg">in progress</span>. Another <span class="sp">event</span> happened during it. <span class="es">Una acción larga y un evento que pasa en medio.</span></p>
+  <div class="card" style="margin-top:14px">
+    <div class="tl" aria-hidden="true"><div class="axis"></div><div class="bar"></div><span class="zap">⚡</span><span class="t1">I was walking along the path…</span><span class="t0">I started walking</span><span class="t2">…when I saw a frog.</span><span class="now">NOW</span></div>
+    <div class="g2 grid"><div><span class="label" style="color:var(--pg)">Past progressive · action in progress</span><p class="ex pg">I was walking along the path</p></div><div><span class="label" style="color:var(--sp)">Simple past · event</span><p class="ex sp">when I saw a frog.</p></div></div>
+    <button class="play sm" data-say="I was walking along the path when I saw a frog.">▶ Listen</button>
+  </div>
+  <div class="g2 grid" style="margin-top:14px">
+    <div class="card"><span class="label">When in the middle</span><p class="ex">We <span class="pg">were exploring</span> the canyon <b>when</b> it <span class="sp">started</span> to rain.</p><button class="play sm" data-say="We were exploring the canyon when it started to rain.">▶ Listen</button></div>
+    <div class="card"><span class="label">When at the start</span><p class="ex"><b>When</b> it <span class="sp">started</span> to rain<b style="color:var(--sun);font-size:1.3em">,</b> we <span class="pg">were exploring</span> the canyon.</p><button class="play sm" data-say="When it started to rain, we were exploring the canyon.">▶ Listen</button></div>
+  </div>
+  <p class="how" style="margin-top:10px">Both sentences describe the same moment. Use a <b>comma</b> after the first part when the sentence starts with <b>when</b>.</p>
+  <div class="block">
+    <div class="row" style="justify-content:space-between"><h3>Complete the sentences</h3><span class="score" id="whScore">0 / 6</span></div>
+    <div class="items" id="whList"></div>
+  </div>
+  <div class="block">
+    <div class="row" style="justify-content:space-between"><h3>Where is the comma?</h3><span class="score" id="cmScore">0 / 4</span></div>
+    <p class="how">Choose the sentence that is written correctly.</p>
+    <div class="items" id="cmList"></div>
+  </div>
+</div></section>
+
+<section class="stop" id="story"><div class="wrap">
+  <div class="marker"><span class="no">STOP 7</span><h2>Leo’s canyon adventure</h2><span class="ico" aria-hidden="true">🦎</span></div>
+  <div class="g2 grid">
+    <div class="block" style="margin-top:0">
+      <div class="story" id="storyText"></div>
+      <div class="row"><button class="play" id="storySay">▶ Listen to the story</button><button class="btn" id="storyShow" aria-pressed="false">Show the grammar</button></div>
+      <div class="legend"><span class="pg">■ Past progressive</span><span class="sp">■ Simple past</span></div>
+    </div>
+    <div class="block" style="margin-top:0">
+      <div class="row" style="justify-content:space-between"><h3>True or false?</h3><span class="score" id="stScore">0 / 6</span></div>
+      <div class="items" id="stList"></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="stop" id="make"><div class="wrap">
+  <div class="marker"><span class="no">STOP 8</span><h2>Make your own adventure</h2><span class="ico" aria-hidden="true">✍️</span></div>
+  <p class="how">Choose the parts of your sentence. Read both versions aloud, then copy your favorite in your notebook. Can you make a funny one? <span class="es">Arma tu oración, léela en voz alta y cópiala en tu cuaderno.</span></p>
+  <div class="card" style="margin-top:14px">
+    <div class="maker">
+      <label for="mWho">Who?<select id="mWho"></select></label>
+      <label for="mDo">Action in progress<select id="mDo"></select></label>
+      <label for="mWhere">Where?<select id="mWhere"></select></label>
+      <label for="mEv">What happened?<select id="mEv"></select></label>
+    </div>
+    <div class="out">
+      <p><small>When in the middle</small><span id="out1"></span></p>
+      <p><small>When at the start</small><span id="out2"></span></p>
+    </div>
+    <div class="row"><button class="play" id="mSay">▶ Listen</button><button class="btn" id="mRand">🎲 Surprise me</button></div>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <p>Learning Well 5 · Unit 1 · Nature adventures. The audio uses your device’s English voice, so it can sound different on each computer or phone.</p>
+  <p id="ttsWarn" hidden style="margin-top:6px;color:var(--bad)">This browser has no text-to-speech voice, so the ▶ buttons cannot play audio here.</p>
+</div></footer>
+
+<script>
+(function(){
+const IMG = {};
+const IMGS = {1:"media/image1.jpg",2:"media/image2.jpg",3:"media/image3.jpg",4:"media/image4.jpg",5:"media/image5.jpg",6:"media/image6.jpg",7:"media/image7.jpg",8:"media/image8.jpg",9:"media/image9.jpg",10:"media/image10.jpg",11:"media/image11.jpg",12:"media/image12.jpg",13:"media/image13.jpg",14:"media/image14.jpg",15:"media/image15.jpg",16:"media/image16.jpg",17:"media/image17.jpg",18:"media/image18.jpg"};
+Object.assign(IMG, IMGS);
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const plain = s => String(s).replace(/[’‘]/g, "'").replace(/<[^>]+>/g, '');
+
+/* audio */
+const hasTTS = 'speechSynthesis' in window; let voice = null;
+function pickVoice(){ const vs = speechSynthesis.getVoices(); voice = vs.find(v => v.lang === 'en-US') || vs.find(v => /^en/i.test(v.lang)) || null; }
+if (hasTTS) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } else { $('#ttsWarn').hidden = false; }
+let cur = null;
+function say(text, btn){
+  if (!hasTTS) { $('#ttsWarn').hidden = false; return; }
+  speechSynthesis.cancel(); if (cur) cur.classList.remove('on');
+  const u = new SpeechSynthesisUtterance(plain(text)); u.lang = 'en-US'; u.rate = 0.85; if (voice) u.voice = voice;
+  if (btn) { cur = btn; btn.classList.add('on'); u.onend = u.onerror = () => btn.classList.remove('on'); }
+  speechSynthesis.speak(u);
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-say]'); if (b) say(b.dataset.say, b); });
+
+/* ---------- vocabulary ---------- */
+const V = [
+ {img:2, w:'coast', es:'costa', def:'Land next to the sea.', g:'By the sea', kind:'place', clue:'It’s land next to the sea.'},
+ {img:3, w:'ocean', es:'océano', def:'A very large area of salt water.', g:'By the sea', kind:'place', clue:'It’s a very large area of salt water.'},
+ {img:4, w:'coral reef', es:'arrecife de coral', def:'A colorful home for many sea animals.', g:'By the sea', kind:'place', clue:'It’s underwater. Fish can live there.'},
+ {img:5, w:'volcano', es:'volcán', def:'A mountain that can send out hot lava.', g:'Mountains and low land', kind:'place', clue:'It’s a mountain. It can send out hot lava.'},
+ {img:1, w:'valley', es:'valle', def:'Low land between hills or mountains.', g:'Mountains and low land', kind:'place', clue:'It’s low land between hills or mountains.'},
+ {img:6, w:'canyon', es:'cañón', def:'A deep valley with steep sides.', g:'Mountains and low land', kind:'place', clue:'It’s a deep valley with steep sides.'},
+ {img:7, w:'desert', es:'desierto', def:'A place with very little rain.', g:'Dry places and open land', kind:'place', clue:'It’s very dry. It doesn’t rain much there.'},
+ {img:8, w:'sand dune', es:'duna de arena', def:'A hill made of sand.', g:'Dry places and open land', kind:'place', clue:'It’s a hill made of sand.'},
+ {img:9, w:'grasslands', es:'pastizales', def:'Large areas covered mostly with grass.', g:'Dry places and open land', kind:'place', clue:'They’re large areas with lots of grass.'},
+ {img:10, w:'rainforest', es:'selva tropical', def:'A forest where it rains a lot.', g:'In the forest', kind:'place', clue:'It’s a forest. It rains a lot there.'},
+ {img:11, w:'path', es:'sendero', def:'A small track you can walk along.', g:'In the forest', kind:'place', clue:'You can walk along it. It’s small and narrow.'},
+ {img:12, w:'stream', es:'arroyo', def:'A small river.', g:'In the forest', kind:'place', clue:'It carries water. It’s smaller than a river.'},
+ {img:13, w:'flat', es:'plano', def:'The land has no hills or slopes.', g:'What is the ground like?', kind:'ground'},
+ {img:14, w:'grassy', es:'con pasto', def:'The ground is covered with grass.', g:'What is the ground like?', kind:'ground'},
+ {img:15, w:'muddy', es:'lodoso', def:'The ground is covered with wet dirt.', g:'What is the ground like?', kind:'ground'},
+ {img:16, w:'rocky', es:'rocoso', def:'The ground has a lot of rocks.', g:'Rocks, sand and slopes', kind:'ground'},
+ {img:17, w:'sandy', es:'arenoso', def:'The ground is covered with sand.', g:'Rocks, sand and slopes', kind:'ground'},
+ {img:18, w:'steep', es:'empinado', def:'The ground goes up or down sharply.', g:'Rocks, sand and slopes', kind:'ground'}];
+const byW = w => V.find(v => v.w === w);
+const GROUPS = ['All', ...new Set(V.map(v => v.g))];
+let group = 'All';
+function drawVocab(){
+  $('#groupTabs').innerHTML = GROUPS.map(g => `<button class="tab" aria-pressed="${g === group}" data-g="${g}">${g}</button>`).join('');
+  $('#vocabGrid').innerHTML = V.filter(v => group === 'All' || v.g === group).map(v => `
+    <div class="card vcard"><img src="${IMG[v.img]}" alt="${esc(v.w)}" loading="lazy"><div class="in">
+      <span class="kind">${v.kind === 'place' ? 'Place in nature' : 'What the ground is like'}</span>
+      <span class="w">${esc(v.w)}</span><span class="es">${esc(v.es)}</span><span>${esc(v.def)}</span>
+      <button class="play sm" data-say="${esc(v.w)}. ${esc(v.def)}">▶ Listen</button></div></div>`).join('');
+  document.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { group = b.dataset.g; drawVocab(); });
+}
+drawVocab();
+
+/* picture choice item helper */
+function picQuestion(container, opts, ans, onDone){
+  container.innerHTML = opts.map(o => `<button class="pic" data-w="${esc(o.w)}" aria-label="${esc(o.w)}"><img src="${IMG[o.img]}" alt=""><span>${esc(o.w)}</span></button>`).join('');
+  container.querySelectorAll('.pic').forEach(b => b.onclick = () => {
+    const ok = b.dataset.w === ans;
+    if (ok) { b.classList.add('right'); container.querySelectorAll('.pic').forEach(x => x.disabled = true); }
+    else { b.classList.add('wrong'); b.disabled = true; }
+    onDone(ok, b.dataset.w);
+  });
+}
+
+/* explorer questions (from the presentation) */
+const EQ = [
+ ['Which feature is underwater?',['coast','ocean','coral reef'],'coral reef'],
+ ['Which feature can send out lava?',['volcano','valley','canyon'],'volcano'],
+ ['Which feature is a hill made of sand?',['desert','sand dune','grasslands'],'sand dune'],
+ ['Which feature carries water?',['rainforest','path','stream'],'stream'],
+ ['Which ground gets wet and dirty?',['flat','grassy','muddy'],'muddy'],
+ ['Which ground would be hard to climb?',['rocky','sandy','steep'],'steep']];
+let eqOk = 0;
+$('#eqList').innerHTML = EQ.map(([q], i) => `<div class="game"><p class="bigq">${i + 1}. ${esc(q)}</p><div class="pics three" id="eq${i}"></div><span class="fb" id="eqf${i}"></span></div>`).join('');
+EQ.forEach(([q, opts, ans], i) => {
+  let first = true;
+  picQuestion($('#eq' + i), opts.map(byW), ans, (ok, w) => {
+    const f = $('#eqf' + i);
+    if (ok) { if (first) eqOk++; f.className = 'fb good'; f.textContent = '✓ Yes! ' + ans; say(ans); $('#eqScore').textContent = `${eqOk} / 6`; }
+    else { first = false; f.className = 'fb bad'; f.textContent = '✗ That is ' + w + '. Try again!'; }
+  });
+});
+
+/* listen and click */
+let lc = [], lcI = 0, lcPts = 0, lcFirst = true;
+function lcStart(){ lc = shuffle(V).slice(0, 10); lcI = 0; lcPts = 0; lcShow(); }
+function lcShow(){
+  $('#lcFb').textContent = ''; $('#lcNext').hidden = true; $('#lcScore').textContent = `${lcPts} / 10`; lcFirst = true;
+  if (lcI >= lc.length) { $('#lcPics').innerHTML = `<p class="bigq" style="grid-column:1/-1">Well done, explorer! ${lcPts} out of 10. 🏕️</p>`; $('#lcNext').hidden = false; $('#lcNext').textContent = 'Play again'; $('#lcNext').onclick = lcStart; return; }
+  const t = lc[lcI], opts = shuffle([t, ...shuffle(V.filter(v => v !== t)).slice(0, 3)]);
+  $('#lcPlay').onclick = e => say(t.w, e.currentTarget);
+  $('#lcPics').innerHTML = opts.map(o => `<button class="pic" data-w="${esc(o.w)}" aria-label="Photo option"><img src="${IMG[o.img]}" alt=""></button>`).join('');
+  $('#lcPics').querySelectorAll('.pic').forEach(b => b.onclick = () => {
+    if (b.dataset.w === t.w) { if (lcFirst) lcPts++; b.classList.add('right'); $('#lcPics').querySelectorAll('.pic').forEach(x => x.disabled = true);
+      $('#lcFb').className = 'fb good'; $('#lcFb').textContent = '✓ Yes! ' + t.w; $('#lcScore').textContent = `${lcPts} / 10`;
+      $('#lcNext').hidden = false; $('#lcNext').textContent = 'Next ›'; $('#lcNext').onclick = () => { lcI++; lcShow(); }; }
+    else { lcFirst = false; b.classList.add('wrong'); b.disabled = true; $('#lcFb').className = 'fb bad'; $('#lcFb').textContent = '✗ That is ' + b.dataset.w + '. Listen again!'; }
+  });
+  setTimeout(() => say(t.w), 300);
+}
+lcStart();
+
+/* read the meaning */
+let rm = [], rmI = 0, rmPts = 0;
+function rmStart(){ rm = shuffle(V); rmI = 0; rmPts = 0; rmShow(); }
+function rmShow(){
+  $('#rmFb').textContent = ''; $('#rmNext').hidden = true; $('#rmScore').textContent = `${rmPts} / 18`;
+  if (rmI >= rm.length) { $('#rmQ').textContent = `Finished! ${rmPts} out of 18. 🌄`; $('#rmOpts').innerHTML = ''; $('#rmNext').hidden = false; $('#rmNext').textContent = 'Play again'; $('#rmNext').onclick = rmStart; return; }
+  const t = rm[rmI], same = V.filter(v => v !== t && v.kind === t.kind);
+  $('#rmQ').textContent = `“${t.def}”`;
+  $('#rmOpts').innerHTML = shuffle([t, ...shuffle(same).slice(0, 2)]).map(o => `<button class="opt">${esc(o.w)}</button>`).join('');
+  $('#rmOpts').querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    const ok = b.textContent === t.w;
+    $('#rmOpts').querySelectorAll('.opt').forEach(x => { x.disabled = true; if (x.textContent === t.w) x.classList.add('right'); });
+    if (ok) rmPts++; else b.classList.add('wrong');
+    $('#rmFb').className = 'fb ' + (ok ? 'good' : 'bad'); $('#rmFb').textContent = ok ? '✓ Correct!' : '✗ It’s ' + t.w + '.';
+    $('#rmScore').textContent = `${rmPts} / 18`; say(t.w);
+    $('#rmNext').hidden = false; $('#rmNext').textContent = 'Next ›'; $('#rmNext').onclick = () => { rmI++; rmShow(); };
+  });
+}
+rmStart();
+
+/* memory */
+let mmOpen = [], mmGot = 0, mmLock = false;
+function mmStart(){
+  const pick = shuffle(V).slice(0, 6);
+  const cards = shuffle([...pick.map(v => ({k:v.w, img:v.img})), ...pick.map(v => ({k:v.w, word:v.w}))]);
+  mmOpen = []; mmGot = 0; mmLock = false; $('#mmScore').textContent = '0 / 6 pairs';
+  $('#memory').innerHTML = cards.map(c => `<button class="mc" data-k="${esc(c.k)}" aria-label="Hidden card">?</button>`).join('');
+  document.querySelectorAll('.mc').forEach((b, i) => b.onclick = () => {
+    if (mmLock || b.classList.contains('up') || b.classList.contains('got')) return;
+    const c = cards[i]; b.classList.add('up'); b.innerHTML = c.img ? `<img src="${IMG[c.img]}" alt="${esc(c.k)}">` : esc(c.word); b.setAttribute('aria-label', c.k);
+    if (c.word) say(c.word);
+    mmOpen.push(b);
+    if (mmOpen.length === 2) {
+      const [a, z] = mmOpen;
+      if (a.dataset.k === z.dataset.k) { a.classList.replace('up', 'got'); z.classList.replace('up', 'got'); mmOpen = []; mmGot++; $('#mmScore').textContent = `${mmGot} / 6 pairs` + (mmGot === 6 ? ' · You win! 🏆' : ''); }
+      else { mmLock = true; setTimeout(() => { [a, z].forEach(x => { x.classList.remove('up'); x.textContent = '?'; x.setAttribute('aria-label', 'Hidden card'); }); mmOpen = []; mmLock = false; }, 1100); }
+    }
+  });
+}
+$('#mmNew').onclick = mmStart; mmStart();
+
+/* guess the place */
+const PLACES = V.filter(v => v.kind === 'place');
+let gs = [], gsI = 0, gsPts = 0, gsFirst = true;
+function gsStart(){ gs = shuffle(PLACES).slice(0, 8); gsI = 0; gsPts = 0; gsShow(); }
+function gsShow(){
+  $('#gsFb').textContent = ''; $('#gsNext').hidden = true; $('#gsScore').textContent = `${gsPts} / 8`; gsFirst = true;
+  if (gsI >= gs.length) { $('#gsClue').textContent = `Great guessing! ${gsPts} out of 8.`; $('#gsPics').innerHTML = ''; $('#gsNext').hidden = false; $('#gsNext').textContent = 'Play again'; $('#gsNext').onclick = gsStart; return; }
+  const t = gs[gsI];
+  $('#gsClue').textContent = `“${t.clue}”`;
+  $('#gsSay').onclick = e => say(t.clue, e.currentTarget);
+  picQuestion($('#gsPics'), shuffle([t, ...shuffle(PLACES.filter(v => v !== t)).slice(0, 2)]), t.w, (ok, w) => {
+    if (ok) { if (gsFirst) gsPts++; $('#gsFb').className = 'fb good'; $('#gsFb').textContent = `✓ Is it a ${t.w}? Yes, it is!`; say(`Is it a ${t.w}? Yes, it is!`);
+      $('#gsScore').textContent = `${gsPts} / 8`; $('#gsNext').hidden = false; $('#gsNext').textContent = 'Next ›'; $('#gsNext').onclick = () => { gsI++; gsShow(); }; }
+    else { gsFirst = false; $('#gsFb').className = 'fb bad'; $('#gsFb').textContent = `✗ Is it a ${w}? No, it isn’t. Try again!`; }
+  });
+}
+gsStart();
+$('#clueCards').innerHTML = PLACES.map((v, i) => `<div class="card" id="cc${i}"><span class="label">Card ${i + 1}</span><p class="ex" style="font-size:21px">“${esc(v.clue)}”</p><span class="es">Answer: <b>${esc(v.w)}</b></span></div>`).join('');
+$('#pickClue').onclick = () => { document.querySelectorAll('#clueCards .card').forEach(c => c.classList.remove('pick')); const i = Math.floor(Math.random() * PLACES.length); $('#cc' + i).classList.add('pick'); $('#cc' + i).scrollIntoView({block:'nearest', behavior:'smooth'}); };
+
+/* form tabs */
+function formTabs(tabsEl, outEl, forms, color){
+  let c = 0;
+  function draw(){
+    tabsEl.innerHTML = forms.map((f, i) => `<button class="tab" aria-pressed="${i === c}" data-f="${i}">${f.name}</button>`).join('');
+    const f = forms[c];
+    outEl.innerHTML = `<div class="card"><p class="formula">${f.formula}</p>${f.ex.map(s => `<div class="row" style="justify-content:space-between;background:var(--surface-2);border-radius:12px;padding:10px 14px"><p class="ex">${s}</p><button class="play sm" data-say="${esc(plain(s))}">▶ Listen</button></div>`).join('')}<p class="how">${f.note}</p></div>`;
+    tabsEl.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { c = +b.dataset.f; draw(); });
+  }
+  draw();
+}
+formTabs($('#pgTabs'), $('#pgForm'), [
+ {name:'✓ Affirmative', formula:'Subject + <span class="pg">was / were</span> + <span class="pg">verb-ing</span>', ex:['I <span class="pg">was walking</span> along the path.'], note:'Use <b>was</b> with I, he, she and it. Use <b>were</b> with you, we and they.'},
+ {name:'✗ Negative', formula:'Subject + <span class="pg">wasn’t / weren’t</span> + <span class="pg">verb-ing</span>', ex:['They <span class="pg">weren’t swimming</span> in the ocean.'], note:'wasn’t = was not · weren’t = were not'},
+ {name:'? Question', formula:'<span class="pg">Was / Were</span> + subject + <span class="pg">verb-ing</span>?', ex:['<span class="pg">Were</span> you <span class="pg">walking</span> along the coast?'], note:'Short answers: Yes, I was. / No, I wasn’t. · Yes, they were. / No, they weren’t.'}]);
+formTabs($('#spTabs'), $('#spForm'), [
+ {name:'✓ Affirmative', formula:'Subject + <span class="sp">past form</span>', ex:['We <span class="sp">crossed</span> the stream.','She <span class="sp">saw</span> a frog.'], note:'<b>Crossed</b> is regular (-ed). <b>Saw</b> is irregular.'},
+ {name:'✗ Negative', formula:'Subject + <span class="sp">didn’t</span> + base verb', ex:['We <span class="sp">didn’t cross</span> the stream.'], note:'After didn’t, use the base form: <b>cross</b>, <b>see</b>.'},
+ {name:'? Question', formula:'<span class="sp">Did</span> + subject + base verb?', ex:['<span class="sp">Did</span> you <span class="sp">see</span> a frog?'], note:'Short answers: Yes, I did. / No, I didn’t.'}]);
+
+/* choice list */
+function choiceList(el, items, scoreEl, total){
+  let ok = 0;
+  el.innerHTML = items.map((it, i) => `<div class="item" id="${el.id}-${i}"><span class="t">${it.html}</span><span class="row">${shuffle(it.opts).map(o => `<button class="opt" data-i="${i}">${esc(o)}</button>`).join('')}</span><span class="fb" id="${el.id}-f${i}" style="flex-basis:100%"></span></div>`).join('');
+  el.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    const i = +b.dataset.i, it = items[i], right = b.textContent === it.ans;
+    el.querySelectorAll(`.opt[data-i="${i}"]`).forEach(x => { x.disabled = true; if (x.textContent === it.ans) x.classList.add('right'); });
+    if (right) { ok++; $(`#${el.id}-${i}`).classList.add('good'); } else b.classList.add('wrong');
+    const bl = $(`#${el.id}-${i} .blank`); if (bl) bl.textContent = it.ans;
+    const f = $(`#${el.id}-f${i}`); f.className = 'fb ' + (right ? 'good' : 'bad'); f.textContent = (right ? '✓ ' : '✗ ') + (it.why || (right ? 'Correct!' : 'The answer is ' + it.ans + '.'));
+    if (it.full) say(it.full);
+    scoreEl.textContent = `${ok} / ${total}`;
+  });
+}
+const B = '<span class="blank">___</span>';
+const WW = [['I','walking along the path','was'],['We','swimming in the ocean','were'],['She','climbing the volcano','was'],['They','exploring the canyon','were'],['You','crossing the stream','were'],['The bird','flying over the valley','was']];
+choiceList($('#wwList'), WW.map(([s, r, a]) => ({html:`${esc(s)} ${B} ${esc(r)}.`, opts:['was','were'], ans:a, full:`${s} ${a} ${r}.`, why: a === 'was' ? `${s} → was` : `${s} → were`})), $('#wwScore'), 6);
+const SP = [
+ {html:`We ${B} the stream yesterday.`, opts:['crossed','cross','crossing'], ans:'crossed', full:'We crossed the stream yesterday.', why:'Regular verb: cross → crossed.'},
+ {html:`She ${B} a frog near the path.`, opts:['saw','seed','see'], ans:'saw', full:'She saw a frog near the path.', why:'Irregular verb: see → saw.'},
+ {html:`We didn’t ${B} the volcano.`, opts:['climb','climbed','climbing'], ans:'climb', full:"We didn't climb the volcano.", why:'After didn’t → base verb.'},
+ {html:`${B} you see the coral reef?`, opts:['Did','Was','Do'], ans:'Did', full:'Did you see the coral reef?', why:'Question in the simple past → Did…?'},
+ {html:`They ${B} a sand dune in the desert.`, opts:['found','finded','find'], ans:'found', full:'They found a sand dune in the desert.', why:'Irregular verb: find → found.'},
+ {html:`I didn’t ${B} any fish in the stream.`, opts:['see','saw','seen'], ans:'see', full:"I didn't see any fish in the stream.", why:'After didn’t → base verb: see.'}];
+choiceList($('#spList'), SP, $('#spScore'), 6);
+const WH = [
+ {html:`I ${B} (walk) along the path when I ${B} (see) a frog.`, opts:['was walking / saw','walked / was seeing','was walking / was seeing'], ans:'was walking / saw', full:'I was walking along the path when I saw a frog.'},
+ {html:`We ${B} (explore) the canyon when it ${B} (start) to rain.`, opts:['were exploring / started','explored / was starting','were exploring / was starting'], ans:'were exploring / started', full:'We were exploring the canyon when it started to rain.'},
+ {html:`She ${B} (swim) in the ocean when she ${B} (see) a turtle.`, opts:['was swimming / saw','swam / was seeing','was swimming / was seeing'], ans:'was swimming / saw', full:'She was swimming in the ocean when she saw a turtle.'},
+ {html:`They ${B} (climb) the volcano when the ground ${B} (shake).`, opts:['were climbing / shook','climbed / was shaking','was climbing / shook'], ans:'were climbing / shook', full:'They were climbing the volcano when the ground shook.'},
+ {html:`When the bird ${B} (sing), Tom ${B} (sit) near the stream.`, opts:['sang / was sitting','was singing / sat','sang / sat'], ans:'sang / was sitting', full:'When the bird sang, Tom was sitting near the stream.'},
+ {html:`When we ${B} (find) the shell, we ${B} (walk) along the coast.`, opts:['found / were walking','were finding / walked','found / was walking'], ans:'found / were walking', full:'When we found the shell, we were walking along the coast.'}];
+choiceList($('#whList'), WH.map(w => ({...w, why:'The long action uses the past progressive. The event after “when” uses the simple past.'})), $('#whScore'), 6);
+const CM = [
+ {opts:['When it started to rain, we were exploring the canyon.','When it started to rain we were exploring, the canyon.'], ans:'When it started to rain, we were exploring the canyon.'},
+ {opts:['I was walking along the path when I saw a frog.','I was walking along the path, when, I saw a frog.'], ans:'I was walking along the path when I saw a frog.'},
+ {opts:['When I saw the volcano, I was riding my bike.','When I saw the volcano I was riding, my bike.'], ans:'When I saw the volcano, I was riding my bike.'},
+ {opts:['They were swimming in the ocean when they saw a dolphin.','They were swimming, in the ocean when they saw a dolphin.'], ans:'They were swimming in the ocean when they saw a dolphin.'}];
+choiceList($('#cmList'), CM.map((c, i) => ({...c, html:`Sentence ${i + 1}`, full:c.ans, why: c.ans.startsWith('When') ? 'Starts with when → comma after the first part.' : 'When is in the middle → no comma.'})), $('#cmScore'), 4);
+
+/* story */
+const STORY = [
+ 'Last Saturday, Leo and his family ', ['s','visited'], ' a canyon. The ground ', ['s','was'], ' rocky and steep. They ', ['p','were walking'], ' along a narrow path when Leo ', ['s','saw'], ' a small lizard. It ', ['p','was sitting'], ' on a hot rock! ',
+ 'Later, they ', ['p','were eating'], ' sandwiches near a stream when it ', ['s','started'], ' to rain. The path ', ['s','became'], ' muddy, so they ', ['s','walked'], ' back slowly. ',
+ 'When they ', ['s','arrived'], ' at the car, everyone ', ['s','was'], ' wet and tired, but happy.'];
+$('#storyText').innerHTML = '<p>' + STORY.map(x => typeof x === 'string' ? esc(x) : `<span class="v ${x[0]}">${esc(x[1])}</span>`).join('') + '</p>';
+const storyPlain = STORY.map(x => typeof x === 'string' ? x : x[1]).join('');
+$('#storySay').onclick = e => say(storyPlain, e.currentTarget);
+$('#storyShow').onclick = e => { const on = $('#storyText').classList.toggle('show'); e.currentTarget.setAttribute('aria-pressed', on); e.currentTarget.textContent = on ? 'Hide the grammar' : 'Show the grammar'; };
+const ST = [
+ {html:'Leo and his family visited a desert.', ans:'False', why:'They visited a canyon.'},
+ {html:'The ground in the canyon was rocky and steep.', ans:'True', why:'Yes, it was rocky and steep.'},
+ {html:'Leo saw a lizard while they were walking along the path.', ans:'True', why:'They were walking along a path when Leo saw a lizard.'},
+ {html:'They were swimming when it started to rain.', ans:'False', why:'They were eating sandwiches near a stream.'},
+ {html:'The path became muddy.', ans:'True', why:'The rain made the path muddy.'},
+ {html:'The family was sad at the end.', ans:'False', why:'They were wet and tired, but happy.'}];
+choiceList($('#stList'), ST.map(s => ({...s, opts:['True','False']})), $('#stScore'), 6);
+
+/* adventure maker */
+const WHO = [['I','was'],['We','were'],['My friend','was'],['My family','was'],['My classmates','were']];
+const DO = ['walking along','swimming in','exploring','climbing','camping near','riding bikes on','taking photos of'];
+const WHERE = ['the path','the stream','the canyon','the volcano','the coast','the ocean','the desert','the rainforest','the valley','a sand dune','the grasslands','the coral reef'];
+const EV = ['I saw a frog','it started to rain','we heard a strange noise','a bird flew over us','I found a shell','my shoes got muddy','a monkey took my hat','the ground shook'];
+const fill = (id, arr, f) => { $(id).innerHTML = arr.map((x, i) => `<option value="${i}">${esc(f ? f(x) : x)}</option>`).join(''); };
+fill('#mWho', WHO, x => x[0]); fill('#mDo', DO, x => '… ' + x); fill('#mWhere', WHERE); fill('#mEv', EV, x => 'when ' + x);
+function make(){
+  const [who, be] = WHO[+$('#mWho').value], d = DO[+$('#mDo').value], w = WHERE[+$('#mWhere').value], ev = EV[+$('#mEv').value];
+  const verb = d.split(' ')[0], rest = d.slice(verb.length);
+  const evH = esc(ev).replace(/\b(saw|started|heard|flew|found|got|took|shook)\b/, '<span class="sp">$1</span>');
+  const who2 = who === 'I' ? 'I' : who.charAt(0).toLowerCase() + who.slice(1);
+  $('#out1').innerHTML = `${esc(who)} <span class="pg">${be} ${esc(verb)}</span>${esc(rest)} ${esc(w)} <b>when</b> ${evH}.`;
+  $('#out2').innerHTML = `<b>When</b> ${evH}, ${esc(who2)} <span class="pg">${be} ${esc(verb)}</span>${esc(rest)} ${esc(w)}.`;
+  return [$('#out1').textContent, $('#out2').textContent];
+}
+['#mWho','#mDo','#mWhere','#mEv'].forEach(id => $(id).onchange = make);
+$('#mRand').onclick = () => { ['#mWho','#mDo','#mWhere','#mEv'].forEach(id => { const s = $(id); s.selectedIndex = Math.floor(Math.random() * s.options.length); }); make(); };
+$('#mSay').onclick = e => { const [a, b] = make(); say(a + ' ' + b, e.currentTarget); };
+$('#mWhere').value = '0'; $('#mEv').value = '0'; make();
+})();
+</script>
+
+</body></html>

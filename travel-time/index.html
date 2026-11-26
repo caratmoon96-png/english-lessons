@@ -1,0 +1,529 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></head><body>
+<title>Travel Time!</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: airport wayfinding. Each section is a "gate" with a black-and-yellow sign header; picture cards and big touch targets for 11–12 year olds. */
+:root{
+  --bg:#F2F5F9; --surface:#FFFFFF; --surface-2:#E6ECF4; --ink:#121826; --ink-soft:#4A5568; --line:#CBD5E1;
+  --sign:#16181D; --sign-ink:#F5C518; --sky:#1D6FD1; --sky-ink:#FFFFFF; --pp:#1D6FD1; --sp:#C2410C;
+  --good:#1F7A3A; --good-bg:#DDF2E3; --bad:#B3261E; --bad-bg:#FBE3E1;
+  --display:'Bricolage Grotesque','Trebuchet MS',sans-serif; --body:'Atkinson Hyperlegible',Verdana,sans-serif; --r:16px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0D1118; --surface:#171C26; --surface-2:#212836; --ink:#EEF2F8; --ink-soft:#AEB8C8; --line:#323B4C;
+  --sign:#050608; --sky:#6AAAF5; --sky-ink:#0D1118; --pp:#7DB5FF; --sp:#FF9A5C;
+  --good:#7FD99A; --good-bg:#183A26; --bad:#FF9C94; --bad-bg:#43201E; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0D1118; --surface:#171C26; --surface-2:#212836; --ink:#EEF2F8; --ink-soft:#AEB8C8; --line:#323B4C;
+  --sign:#050608; --sky:#6AAAF5; --sky-ink:#0D1118; --pp:#7DB5FF; --sp:#FF9A5C;
+  --good:#7FD99A; --good-bg:#183A26; --bad:#FF9C94; --bad-bg:#43201E; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--sign)}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.1;margin:0}
+p{margin:0}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--sign-ink);outline-offset:2px}
+img{display:block}
+
+nav.board{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--sign)}
+nav.board .wrap{display:flex;gap:6px;overflow-x:auto;padding-block:10px;scrollbar-width:thin}
+nav.board a{flex:none;text-decoration:none;color:var(--sign-ink);font-weight:700;font-size:14px;padding:6px 12px;border-radius:8px;border:1px solid #3A3D45;white-space:nowrap;font-family:var(--display)}
+nav.board a:hover{background:#2A2D35}
+
+.hero{position:relative;color:#fff;background:var(--sign)}
+.hero img{width:100%;height:clamp(240px,40vw,420px);object-fit:cover;opacity:.75}
+.hero .over{position:absolute;inset:0;display:flex;align-items:flex-end;background:linear-gradient(to top,rgba(5,6,8,.85),rgba(5,6,8,0) 60%)}
+.hero .over .wrap{width:100%;padding-block:28px}
+.hero .flight{display:inline-flex;gap:10px;align-items:center;background:var(--sign-ink);color:#16181D;font-family:var(--display);font-weight:800;padding:6px 12px;border-radius:8px;font-size:15px;letter-spacing:.06em}
+.hero h1{font-size:clamp(48px,9vw,96px);font-weight:800;letter-spacing:-.02em;margin-top:10px;color:#fff}
+.hero p{font-size:20px;max-width:46ch;color:#E9EEF6}
+
+section.gate{padding-block:36px}
+.sign{display:flex;flex-wrap:wrap;align-items:center;gap:14px;background:var(--sign);color:var(--sign-ink);border-radius:14px;padding:14px 20px;margin-bottom:18px}
+.sign .no{font-family:var(--display);font-weight:800;font-size:15px;background:var(--sign-ink);color:#16181D;border-radius:8px;padding:4px 10px;letter-spacing:.06em}
+.sign h2{font-size:clamp(26px,4vw,36px);font-weight:800;color:var(--sign-ink);flex:1 1 260px}
+.sign .arrow{font-family:var(--display);font-size:30px;font-weight:800}
+.how{color:var(--ink-soft);max-width:64ch}
+.es{color:var(--ink-soft);font-size:15px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.block{display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.block h3{font-size:26px;font-weight:800}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-weight:700}
+.tab[aria-pressed="true"]{background:var(--sign);border-color:var(--sign);color:var(--sign-ink)}
+.vcard{padding:0;overflow:hidden}
+.vcard img{width:100%;aspect-ratio:16/9;object-fit:cover;max-width:100%}
+.vcard .in{padding:12px 16px 16px;display:flex;flex-direction:column;gap:6px}
+.vcard .w{font-family:var(--display);font-size:26px;font-weight:800}
+.vcard .clue{font-style:italic}
+.play{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:999px;background:var(--sky);color:var(--sky-ink);font-weight:700;padding:8px 16px;align-self:flex-start}
+.play.sm{padding:5px 12px;font-size:15px}
+.play.on{background:var(--sign-ink);color:#16181D}
+.btn{border:2px solid var(--ink);background:transparent;border-radius:12px;padding:9px 18px;font-weight:700}
+.btn.solid{background:var(--sign);border-color:var(--sign);color:var(--sign-ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.score{font-family:var(--display);font-weight:800;font-size:20px;padding:6px 14px;border-radius:10px;background:var(--sign);color:var(--sign-ink);white-space:nowrap}
+.fb{font-weight:700;min-height:1.5em}
+.fb.good{color:var(--good)} .fb.bad{color:var(--bad)}
+.opt{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 16px;font-weight:700;text-align:left}
+.opt:hover:not(:disabled){border-color:var(--sky)}
+.opt.right{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.opt:disabled{cursor:default}
+.game{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:14px}
+.pics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.pic{border:4px solid transparent;border-radius:14px;padding:0;background:var(--surface-2);overflow:hidden}
+.pic img{width:100%;aspect-ratio:16/10;object-fit:cover}
+.pic:hover:not(:disabled){border-color:var(--sky)}
+.pic.right{border-color:var(--good)} .pic.wrong{border-color:var(--bad);opacity:.55}
+.bigq{font-family:var(--display);font-size:clamp(24px,3.6vw,32px);font-weight:800}
+.memory{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.mc{aspect-ratio:4/3;border:none;border-radius:12px;background:var(--sign);color:var(--sign-ink);font-family:var(--display);font-weight:800;font-size:clamp(14px,2.2vw,20px);padding:6px;display:grid;place-items:center;overflow:hidden;text-align:center}
+.mc img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.mc.up{background:var(--surface);color:var(--ink);border:2px solid var(--line)}
+.mc.got{background:var(--good-bg);color:var(--good);border:2px solid var(--good)}
+.uses{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.label{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--sky)}
+.ex{font-family:var(--display);font-size:24px;font-weight:700}
+.pp{color:var(--pp);font-weight:700} .sp{color:var(--sp);font-weight:700}
+.formula{font-family:var(--display);font-weight:800;font-size:clamp(20px,3vw,26px);background:var(--surface-2);padding:12px 16px;border-radius:12px}
+.tl{position:relative;height:70px}
+.tl .axis{position:absolute;left:0;right:0;top:32px;height:4px;background:var(--line);border-radius:2px}
+.tl .bar{position:absolute;left:12%;right:40px;top:24px;height:20px;border-radius:10px;background:var(--pp)}
+.tl .dot{position:absolute;top:22px;width:24px;height:24px;border-radius:50%;background:var(--sign-ink);border:3px solid var(--surface)}
+.tl .lab{position:absolute;top:50px;font-size:14px;font-weight:700;color:var(--ink-soft);white-space:nowrap}
+.tl .now{position:absolute;right:0;top:16px;background:var(--sign);color:var(--sign-ink);font-weight:800;font-family:var(--display);padding:4px 8px;border-radius:6px;font-size:14px}
+.tablewrap{overflow-x:auto}
+table.v{width:100%;border-collapse:collapse;background:var(--surface);border-radius:12px;overflow:hidden;font-size:17px}
+table.v th,table.v td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}
+table.v th{background:var(--sign);color:var(--sign-ink);font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.items{display:flex;flex-direction:column;gap:10px}
+.item{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.item .t{font-family:var(--display);font-size:21px;font-weight:700;flex:1 1 280px;min-width:0}
+.item .blank{display:inline-block;min-width:4em;border-bottom:3px solid var(--sky);text-align:center;color:var(--sky)}
+.item.good{border-color:var(--good);background:var(--good-bg)}
+.passport{background:var(--sign);color:#F3F4F6;border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:12px}
+.passport h3{color:var(--sign-ink);font-size:24px}
+.stamps{display:flex;flex-wrap:wrap;gap:10px;min-height:64px}
+.stamp{width:84px;height:84px;border-radius:50%;border:3px dashed var(--sign-ink);color:var(--sign-ink);display:grid;place-items:center;text-align:center;font-weight:800;font-size:12px;line-height:1.15;padding:6px;transform:rotate(-8deg);font-family:var(--display)}
+.stamp:nth-child(2n){transform:rotate(7deg)}
+.mysent{font-size:17px;color:#E5E7EB}
+.ever{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px}
+.ever img{width:96px;height:64px;object-fit:cover;border-radius:10px}
+.ever .q{font-family:var(--display);font-weight:800;font-size:20px}
+.clues{display:flex;flex-wrap:wrap;gap:10px}
+.clue-chip{display:flex;flex-direction:column;gap:6px;align-items:flex-start;background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:10px 12px}
+.clue-chip b{font-family:var(--display);font-size:20px}
+.clue-chip.good{border-color:var(--good);background:var(--good-bg)}
+.story{font-size:20px;line-height:1.8;max-width:66ch;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.story .v{border-radius:4px;transition:background .2s}
+.story.show .v.p{background:color-mix(in srgb,var(--pp) 22%,transparent);color:var(--pp);font-weight:700}
+.story.show .v.s{background:color-mix(in srgb,var(--sp) 22%,transparent);color:var(--sp);font-weight:700}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-weight:700;font-size:15px}
+.interview .card.pick{border:3px solid var(--sign-ink);box-shadow:0 0 0 4px color-mix(in srgb,var(--sign-ink) 35%,transparent)}
+footer{padding-block:28px 48px;color:var(--ink-soft);font-size:14px;border-top:1px solid var(--line)}
+@media (max-width:640px){ .pics{grid-template-columns:repeat(2,minmax(0,1fr))} .memory{grid-template-columns:repeat(3,minmax(0,1fr))} .ever{grid-template-columns:72px minmax(0,1fr)} .ever img{width:72px;height:52px} }
+@media (prefers-reduced-motion: reduce){ .story .v{transition:none} }
+</style>
+
+<nav class="board" aria-label="Sections"><div class="wrap">
+  <a href="#words">Gate 1 · Words</a><a href="#games">Gate 2 · Games</a><a href="#pperfect">Gate 3 · Present perfect</a>
+  <a href="#spast">Gate 4 · Simple past</a><a href="#compare">Gate 5 · Which one?</a><a href="#story">Gate 6 · Mia’s journey</a><a href="#talk">Gate 7 · Interview</a>
+</div></nav>
+
+<header class="hero">
+  <img src="media/image13.jpg" alt="A train travels through green hills">
+  <div class="over"><div class="wrap">
+    <span class="flight">✈ TRAVEL ENGLISH · 6TH GRADE</span>
+    <h1>Travel time!</h1>
+    <p>Learn travel words, then talk about your trips with the present perfect and the simple past.</p>
+  </div></div>
+</header>
+
+<main>
+<section class="gate" id="words"><div class="wrap">
+  <div class="sign"><span class="no">GATE 1</span><h2>Travel words</h2><span class="arrow" aria-hidden="true">→</span></div>
+  <p class="how">Look at each picture and say the word. Press ▶ to listen. <span class="es">Mira cada imagen, escucha y repite la palabra.</span></p>
+  <div class="tabs" id="placeTabs" style="margin-top:14px"></div>
+  <div class="grid g3" id="vocabGrid" style="margin-top:14px"></div>
+</div></section>
+
+<section class="gate" id="games"><div class="wrap">
+  <div class="sign"><span class="no">GATE 2</span><h2>Word games</h2><span class="arrow" aria-hidden="true">↗</span></div>
+  <div class="block" style="margin-top:0">
+    <div class="row" style="justify-content:space-between"><h3>Listen and click</h3><span class="score" id="lcScore">0 / 8</span></div>
+    <p class="how">Listen to the word. Click the right picture. <span class="es">Escucha y haz clic en la imagen correcta.</span></p>
+    <div class="game"><div class="row"><button class="play" id="lcPlay">▶ Listen</button><span class="fb" id="lcFb"></span></div><div class="pics" id="lcPics"></div>
+      <div class="row"><button class="btn solid" id="lcNext" hidden>Next ›</button></div></div>
+  </div>
+  <div class="block">
+    <div class="row" style="justify-content:space-between"><h3>Read the clue</h3><span class="score" id="rcScore">0 / 12</span></div>
+    <p class="how">Read the sentence. Which place, thing or person is it? <span class="es">Lee la pista y elige la palabra.</span></p>
+    <div class="game"><p class="bigq" id="rcQ"></p><div class="row" id="rcOpts"></div><div class="row"><span class="fb" id="rcFb"></span><button class="btn solid" id="rcNext" hidden>Next ›</button></div></div>
+  </div>
+  <div class="block">
+    <div class="row" style="justify-content:space-between"><h3>Memory game</h3><span class="score" id="mmScore">0 / 6 pairs</span></div>
+    <p class="how">Find each picture and its word. <span class="es">Encuentra los pares: imagen y palabra.</span></p>
+    <div class="memory" id="memory"></div>
+    <div class="row"><button class="btn" id="mmNew">New game</button></div>
+  </div>
+</div></section>
+
+<section class="gate" id="pperfect"><div class="wrap">
+  <div class="sign"><span class="no">GATE 3</span><h2>The present perfect</h2><span class="arrow" aria-hidden="true">↺</span></div>
+  <p class="how">We use it to connect the past to <b>now</b>. <span class="es">Conecta el pasado con el presente.</span></p>
+  <div class="uses" style="margin-top:14px">
+    <div class="card"><span class="label">1 · Life experiences</span><p class="ex">I’<span class="pp">ve traveled</span> by ferry.</p><p class="how">It’s an experience I’ve had in my life. We don’t say when.</p><button class="play sm" data-say="I've traveled by ferry.">▶ Listen</button></div>
+    <div class="card"><span class="label">2 · Something that continues</span><p class="ex">She’<span class="pp">s lived</span> here for five years.</p>
+      <div class="tl" aria-hidden="true"><div class="axis"></div><div class="bar"></div><div class="dot" style="left:12%"></div><span class="lab" style="left:7%">5 years ago</span><span class="now">NOW</span></div>
+      <p class="how">She still lives here now.</p><button class="play sm" data-say="She's lived here for five years.">▶ Listen</button></div>
+  </div>
+  <div class="block">
+    <h3>How do we make it?</h3>
+    <div class="tabs" id="ppTabs"></div>
+    <div id="ppForm"></div>
+  </div>
+  <div class="block">
+    <h3>Verb chart</h3>
+    <p class="how">Present perfect uses the <b>past participle</b>. Simple past uses the <b>past form</b>. Tap a row to listen.</p>
+    <div class="tablewrap"><table class="v" id="verbs"></table></div>
+  </div>
+  <div class="block">
+    <div class="row" style="justify-content:space-between"><h3>Have or has?</h3><span class="score" id="hhScore">0 / 6</span></div>
+    <div class="items" id="hhList"></div>
+  </div>
+  <div class="block">
+    <h3>My travel passport: Have you ever…?</h3>
+    <p class="how">Answer each question. Get a stamp for every “Yes”. Then read your sentences aloud. <span class="es">Contesta y gana sellos en tu pasaporte.</span></p>
+    <div class="g2 grid">
+      <div class="items" id="everList"></div>
+      <div class="passport"><h3>PASSPORT · Travel experiences</h3><div class="stamps" id="stamps"><span class="mysent">No stamps yet.</span></div><div class="mysent" id="mySent"></div><button class="play sm" id="sayMine">▶ Listen to my sentences</button></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="gate" id="spast"><div class="wrap">
+  <div class="sign"><span class="no">GATE 4</span><h2>The simple past</h2><span class="arrow" aria-hidden="true">←</span></div>
+  <p class="how">Use the simple past for <b>finished actions</b> at a time in the past: yesterday, last summer, two days ago. <span class="es">Acciones terminadas en un momento del pasado.</span></p>
+  <div class="block" style="margin-top:14px">
+    <div class="tabs" id="spTabs"></div>
+    <div id="spForm"></div>
+  </div>
+  <div class="block">
+    <div class="row" style="justify-content:space-between"><h3>Choose the right form</h3><span class="score" id="spScore">0 / 8</span></div>
+    <div class="items" id="spList"></div>
+  </div>
+</div></section>
+
+<section class="gate" id="compare"><div class="wrap">
+  <div class="sign"><span class="no">GATE 5</span><h2>Present perfect or simple past?</h2><span class="arrow" aria-hidden="true">⇄</span></div>
+  <div class="uses">
+    <div class="card"><span class="label">Present perfect</span><p class="ex">I’<span class="pp">ve taken</span> a train before.</p><p class="how">An experience up to now. No exact time.</p><button class="play sm" data-say="I've taken a train before.">▶ Listen</button></div>
+    <div class="card"><span class="label" style="color:var(--sp)">Simple past</span><p class="ex">I <span class="sp">took</span> a train last summer.</p><p class="how">A finished time in the past.</p><button class="play sm" data-say="I took a train last summer.">▶ Listen</button></div>
+  </div>
+  <div class="card" style="margin-top:14px"><span class="label">Compare</span><p class="ex" style="font-size:22px">“Have you ever <span class="pp">taken</span> a train?” “Yes, I <span class="sp">took</span> one last summer.”</p><button class="play sm" data-say="Have you ever taken a train? Yes, I took one last summer.">▶ Listen</button></div>
+  <div class="block">
+    <div class="row" style="justify-content:space-between"><h3>Look at the time clues</h3><span class="score" id="tcScore">0 / 10</span></div>
+    <p class="how">Which tense goes with each time clue? <span class="es">¿Qué tiempo verbal va con cada pista?</span></p>
+    <div class="clues" id="clues"></div>
+  </div>
+  <div class="block">
+    <div class="row" style="justify-content:space-between"><h3>Complete the conversations</h3><span class="score" id="cvScore">0 / 6</span></div>
+    <div class="items" id="cvList"></div>
+  </div>
+</div></section>
+
+<section class="gate" id="story"><div class="wrap">
+  <div class="sign"><span class="no">GATE 6</span><h2>Mia’s ferry journey</h2><span class="arrow" aria-hidden="true">⛴</span></div>
+  <div class="g2 grid">
+    <div class="block" style="margin-top:0">
+      <div class="story" id="storyText"></div>
+      <div class="row"><button class="play" id="storySay">▶ Listen to the story</button><button class="btn" id="storyShow" aria-pressed="false">Show the grammar</button></div>
+      <div class="legend"><span class="pp">■ Present perfect</span><span class="sp">■ Simple past</span></div>
+    </div>
+    <div class="block" style="margin-top:0">
+      <div class="row" style="justify-content:space-between"><h3>True or false?</h3><span class="score" id="stScore">0 / 6</span></div>
+      <div class="items" id="stList"></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="gate interview" id="talk"><div class="wrap">
+  <div class="sign"><span class="no">GATE 7</span><h2>Travel interview</h2><span class="arrow" aria-hidden="true">💬</span></div>
+  <p class="how">Work with a partner. Ask “Have you ever…?”. If your partner says “Yes”, ask “When did you…?”. <span class="es">Pregunta con present perfect y, si dice que sí, pregunta cuándo con simple past.</span></p>
+  <div class="row" style="margin-block:14px"><button class="btn solid" id="pick">🎲 Pick a question for us</button></div>
+  <div class="grid g3" id="ivGrid"></div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <p>Travel English · Present perfect and simple past. The audio uses your device’s English voice, so it can sound different on each computer or phone.</p>
+  <p id="ttsWarn" hidden style="margin-top:6px;color:var(--bad)">This browser has no text-to-speech voice, so the ▶ buttons cannot play audio here.</p>
+</div></footer>
+
+<script>
+(function(){
+const IMG = {2:"media/image2.jpg",3:"media/image3.jpg",4:"media/image4.jpg",5:"media/image5.jpg",6:"media/image6.jpg",7:"media/image7.jpg",8:"media/image8.jpg",9:"media/image9.jpg",10:"media/image10.jpg",11:"media/image11.jpg",12:"media/image12.jpg",13:"media/image13.jpg"};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const plain = s => String(s).replace(/[’‘]/g, "'").replace(/<[^>]+>/g, '');
+
+/* audio */
+const hasTTS = 'speechSynthesis' in window; let voice = null;
+function pickVoice(){ const vs = speechSynthesis.getVoices(); voice = vs.find(v => v.lang === 'en-US') || vs.find(v => /^en/i.test(v.lang)) || null; }
+if (hasTTS) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } else { $('#ttsWarn').hidden = false; }
+let cur = null;
+function say(text, btn){
+  if (!hasTTS) { $('#ttsWarn').hidden = false; return; }
+  speechSynthesis.cancel(); if (cur) cur.classList.remove('on');
+  const u = new SpeechSynthesisUtterance(plain(text)); u.lang = 'en-US'; u.rate = 0.85; if (voice) u.voice = voice;
+  if (btn) { cur = btn; btn.classList.add('on'); u.onend = u.onerror = () => btn.classList.remove('on'); }
+  speechSynthesis.speak(u);
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-say]'); if (b) say(b.dataset.say, b); });
+
+/* ---------- vocabulary ---------- */
+const V = [
+ {img:2, w:'ticket machine', es:'máquina de boletos', clue:'Buy a ticket here.', place:'Train station'},
+ {img:3, w:'platform', es:'andén', clue:'Get on the train here.', place:'Train station'},
+ {img:4, w:'waiting room', es:'sala de espera', clue:'Sit here while you wait.', place:'Train station'},
+ {img:5, w:'check-in desk', es:'mostrador de facturación', clue:'Show your ID here.', place:'Airport'},
+ {img:6, w:'luggage cart', es:'carrito de equipaje', clue:'Use it to carry your bags.', place:'Airport'},
+ {img:7, w:'line', es:'fila', clue:'Wait behind other people.', place:'Airport'},
+ {img:8, w:'arrivals', es:'llegadas', clue:'These flights come in.', place:'Signs and sea'},
+ {img:9, w:'departures', es:'salidas', clue:'These flights go out.', place:'Signs and sea'},
+ {img:10, w:'ferry', es:'transbordador', clue:'This boat carries people.', place:'Signs and sea'},
+ {img:11, w:'passenger', es:'pasajero/a', clue:'This person is traveling.', place:'People and trips'},
+ {img:12, w:'ticket collector', es:'revisor/a de boletos', clue:'This person checks tickets.', place:'People and trips'},
+ {img:13, w:'journey', es:'viaje', clue:'You go from one place to another.', place:'People and trips'}];
+const PLACES = ['All', ...new Set(V.map(v => v.place))];
+let place = 'All';
+function drawVocab(){
+  $('#placeTabs').innerHTML = PLACES.map(p => `<button class="tab" aria-pressed="${p === place}" data-place="${p}">${p}</button>`).join('');
+  $('#vocabGrid').innerHTML = V.filter(v => place === 'All' || v.place === place).map(v => `
+    <div class="card vcard"><img src="${IMG[v.img]}" alt="${esc(v.w)}" loading="lazy"><div class="in">
+      <span class="w">${esc(v.w)}</span><span class="es">${esc(v.es)}</span><span class="clue">“${esc(v.clue)}”</span>
+      <button class="play sm" data-say="${esc(v.w)}. ${esc(v.clue)}">▶ Listen</button></div></div>`).join('');
+  document.querySelectorAll('[data-place]').forEach(b => b.onclick = () => { place = b.dataset.place; drawVocab(); });
+}
+drawVocab();
+
+/* ---------- game 1: listen and click ---------- */
+let lcRounds = [], lcI = 0, lcPts = 0;
+function lcStart(){ lcRounds = shuffle(V).slice(0, 8); lcI = 0; lcPts = 0; lcShow(); }
+function lcShow(){
+  $('#lcFb').textContent = ''; $('#lcNext').hidden = true;
+  if (lcI >= lcRounds.length) {
+    $('#lcPics').innerHTML = `<p class="bigq" style="grid-column:1/-1">Great job! You got ${lcPts} out of 8. 🎉</p>`;
+    $('#lcNext').hidden = false; $('#lcNext').textContent = 'Play again'; $('#lcNext').onclick = lcStart; return;
+  }
+  const t = lcRounds[lcI], opts = shuffle([t, ...shuffle(V.filter(v => v !== t)).slice(0, 3)]);
+  $('#lcScore').textContent = `${lcPts} / 8`;
+  $('#lcPics').innerHTML = opts.map(o => `<button class="pic" data-w="${esc(o.w)}" aria-label="Picture option"><img src="${IMG[o.img]}" alt=""></button>`).join('');
+  $('#lcPlay').onclick = e => say(t.w, e.currentTarget);
+  document.querySelectorAll('.pic').forEach(b => b.onclick = () => {
+    const ok = b.dataset.w === t.w;
+    if (ok) {
+      lcPts++; b.classList.add('right'); document.querySelectorAll('.pic').forEach(x => x.disabled = true);
+      $('#lcFb').className = 'fb good'; $('#lcFb').textContent = '✓ Yes! ' + t.w;
+      $('#lcNext').hidden = false; $('#lcNext').textContent = 'Next ›'; $('#lcNext').onclick = () => { lcI++; lcShow(); };
+      $('#lcScore').textContent = `${lcPts} / 8`;
+    } else {
+      b.classList.add('wrong'); b.disabled = true; $('#lcFb').className = 'fb bad'; $('#lcFb').textContent = '✗ Try again! That is: ' + b.dataset.w;
+    }
+  });
+  setTimeout(() => say(t.w), 300);
+}
+lcStart();
+
+/* ---------- game 2: read the clue ---------- */
+let rc = [], rcI = 0, rcPts = 0;
+function rcStart(){ rc = shuffle(V); rcI = 0; rcPts = 0; rcShow(); }
+function rcShow(){
+  $('#rcFb').textContent = ''; $('#rcNext').hidden = true; $('#rcScore').textContent = `${rcPts} / 12`;
+  if (rcI >= rc.length) { $('#rcQ').textContent = `Finished! ${rcPts} out of 12. ✈`; $('#rcOpts').innerHTML = ''; $('#rcNext').hidden = false; $('#rcNext').textContent = 'Play again'; $('#rcNext').onclick = rcStart; return; }
+  const t = rc[rcI];
+  $('#rcQ').textContent = `“${t.clue}”`;
+  $('#rcOpts').innerHTML = shuffle([t, ...shuffle(V.filter(v => v !== t)).slice(0, 2)]).map(o => `<button class="opt">${esc(o.w)}</button>`).join('');
+  $('#rcOpts').querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    const ok = b.textContent === t.w;
+    $('#rcOpts').querySelectorAll('.opt').forEach(x => { x.disabled = true; if (x.textContent === t.w) x.classList.add('right'); });
+    if (!ok) b.classList.add('wrong'); else rcPts++;
+    $('#rcFb').className = 'fb ' + (ok ? 'good' : 'bad'); $('#rcFb').textContent = ok ? '✓ Correct!' : '✗ It’s the ' + t.w + '.';
+    $('#rcScore').textContent = `${rcPts} / 12`; say(t.w);
+    $('#rcNext').hidden = false; $('#rcNext').textContent = 'Next ›'; $('#rcNext').onclick = () => { rcI++; rcShow(); };
+  });
+}
+rcStart();
+
+/* ---------- game 3: memory ---------- */
+let mmOpen = [], mmGot = 0, mmLock = false;
+function mmStart(){
+  const pick = shuffle(V).slice(0, 6);
+  const cards = shuffle([...pick.map(v => ({k:v.w, img:v.img})), ...pick.map(v => ({k:v.w, word:v.w}))]);
+  mmOpen = []; mmGot = 0; mmLock = false; $('#mmScore').textContent = '0 / 6 pairs';
+  $('#memory').innerHTML = cards.map((c, i) => `<button class="mc" data-k="${esc(c.k)}" data-i="${i}" aria-label="Hidden card">?</button>`).join('');
+  document.querySelectorAll('.mc').forEach((b, i) => b.onclick = () => {
+    if (mmLock || b.classList.contains('up') || b.classList.contains('got')) return;
+    const c = cards[i]; b.classList.add('up');
+    b.innerHTML = c.img ? `<img src="${IMG[c.img]}" alt="${esc(c.k)}">` : esc(c.word);
+    b.setAttribute('aria-label', c.k);
+    if (c.word) say(c.word);
+    mmOpen.push(b);
+    if (mmOpen.length === 2) {
+      const [a, z] = mmOpen;
+      if (a.dataset.k === z.dataset.k) { a.classList.replace('up', 'got'); z.classList.replace('up', 'got'); mmOpen = []; mmGot++;
+        $('#mmScore').textContent = `${mmGot} / 6 pairs` + (mmGot === 6 ? ' · You win! 🏆' : ''); }
+      else { mmLock = true; setTimeout(() => { [a, z].forEach(x => { x.classList.remove('up'); x.textContent = '?'; x.setAttribute('aria-label', 'Hidden card'); }); mmOpen = []; mmLock = false; }, 1100); }
+    }
+  });
+}
+$('#mmNew').onclick = mmStart; mmStart();
+
+/* ---------- forms (tabs) ---------- */
+function formTabs(tabsEl, outEl, forms, cls){
+  let cur = 0;
+  function draw(){
+    tabsEl.innerHTML = forms.map((f, i) => `<button class="tab" aria-pressed="${i === cur}" data-f="${i}">${f.name}</button>`).join('');
+    const f = forms[cur];
+    outEl.innerHTML = `<div class="card"><p class="formula">${f.formula}</p>
+      <div class="grid g2">${f.ex.map(([lab, s]) => `<div class="card" style="background:var(--surface-2);border:none"><span class="label" ${cls === 'sp' ? 'style="color:var(--sp)"' : ''}>${lab}</span><p class="ex" style="font-size:22px">${s}</p><button class="play sm" data-say="${esc(plain(s))}">▶ Listen</button></div>`).join('')}</div>
+      <p class="how">${f.note}</p></div>`;
+    tabsEl.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { cur = +b.dataset.f; draw(); });
+  }
+  draw();
+}
+formTabs($('#ppTabs'), $('#ppForm'), [
+ {name:'✓ Affirmative', formula:'Subject + <span class="pp">have / has</span> + <span class="pp">past participle</span>', ex:[['I / you / we / they','I <span class="pp">have traveled</span> by ferry.'],['he / she / it','She <span class="pp">has taken</span> the train.']], note:'Use <b>have</b> with I, you, we and they. Use <b>has</b> with he, she and it. Short forms: I’ve, she’s.'},
+ {name:'✗ Negative', formula:'Subject + <span class="pp">haven’t / hasn’t</span> + <span class="pp">past participle</span>', ex:[['I / you / we / they','We <span class="pp">haven’t been</span> on a ferry.'],['he / she / it','He <span class="pp">hasn’t used</span> a ticket machine.']], note:'You can add <b>before</b> at the end when you talk about experience: <i>I haven’t been on a ferry before.</i>'},
+ {name:'? Questions', formula:'<span class="pp">Have / Has</span> + subject + (ever) + <span class="pp">past participle</span>?', ex:[['Have','<span class="pp">Have</span> you ever <span class="pp">been</span> on a ferry?'],['Has','<span class="pp">Has</span> she ever <span class="pp">taken</span> a train?']], note:'<b>Ever</b> means “at any time in your life”. Short answers: Yes, I have. / No, I haven’t. · Yes, she has. / No, she hasn’t.'}], 'pp');
+formTabs($('#spTabs'), $('#spForm'), [
+ {name:'✓ Affirmative', formula:'Subject + <span class="sp">past form</span> of the verb', ex:[['Regular verb','We <span class="sp">traveled</span> by ferry last summer.'],['Irregular verb','She <span class="sp">took</span> the train yesterday.']], note:'Regular verbs usually add <b>-ed</b>. Some irregular forms are <b>went</b>, <b>took</b> and <b>bought</b>.'},
+ {name:'✗ Negative', formula:'Subject + <span class="sp">didn’t</span> + base form', ex:[['travel','We <span class="sp">didn’t travel</span> by ferry last summer.'],['take','She <span class="sp">didn’t take</span> the train yesterday.']], note:'Use <b>didn’t</b> (did not) with all subjects. After didn’t, use the base form: <b>didn’t take</b>, not <s>didn’t took</s>.'},
+ {name:'? Questions', formula:'<span class="sp">Did</span> + subject + base form?', ex:[['Yes / No','<span class="sp">Did</span> you take the train yesterday?'],['Asking when','<span class="sp">When did</span> you take the train?']], note:'Short answers: Yes, I did. / No, I didn’t.'}], 'sp');
+
+/* verb chart */
+const VB = [['be','was / were','been'],['take','took','taken'],['go','went','gone / been'],['buy','bought','bought'],['see','saw','seen'],['fly','flew','flown'],['travel','traveled','traveled'],['use','used','used'],['wait','waited','waited'],['visit','visited','visited']];
+$('#verbs').innerHTML = `<tr><th>Base form</th><th>Simple past</th><th>Past participle</th><th></th></tr>` + VB.map(([a,b,c]) => `<tr><td><b>${a}</b></td><td class="sp">${b}</td><td class="pp">${c}</td><td><button class="play sm" data-say="${a}. ${b.replace(' / ', ', ')}. ${c.replace(' / ', ', ')}." aria-label="Listen to ${a}">▶</button></td></tr>`).join('');
+
+/* choice list helper */
+function choiceList(el, items, scoreEl, total){
+  let ok = 0;
+  el.innerHTML = items.map((it, i) => `<div class="item" id="${el.id}-${i}"><span class="t">${it.html}</span><span class="row">${shuffle(it.opts).map(o => `<button class="opt" data-i="${i}">${esc(o)}</button>`).join('')}</span><span class="fb" id="${el.id}-f${i}" style="flex-basis:100%"></span></div>`).join('');
+  el.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    const i = +b.dataset.i, it = items[i], right = b.textContent === it.ans;
+    el.querySelectorAll(`.opt[data-i="${i}"]`).forEach(x => { x.disabled = true; if (x.textContent === it.ans) x.classList.add('right'); });
+    const f = $(`#${el.id}-f${i}`);
+    if (right) { ok++; $(`#${el.id}-${i}`).classList.add('good'); }
+    else b.classList.add('wrong');
+    const bl = $(`#${el.id}-${i} .blank`); if (bl) bl.textContent = it.ans;
+    f.className = 'fb ' + (right ? 'good' : 'bad'); f.textContent = (right ? '✓ ' : '✗ ') + (it.why || (right ? 'Correct!' : 'The answer is ' + it.ans + '.'));
+    if (it.full) say(it.full);
+    scoreEl.textContent = `${ok} / ${total}`;
+  });
+}
+const B = '<span class="blank">___</span>';
+
+/* have / has */
+const HH = [['I','traveled by ferry','have'],['She','taken the train','has'],['We','been to the airport','have'],['My dad','used a ticket machine','has'],['They','waited in the waiting room','have'],['The ferry','arrived','has']];
+choiceList($('#hhList'), HH.map(([s, r, a]) => ({html:`${esc(s)} ${B} ${esc(r)}.`, opts:['have','has'], ans:a, full:`${s} ${a} ${r}.`, why: a === 'has' ? `${s} = he / she / it → has` : `${s} → have`})), $('#hhScore'), 6);
+
+/* have you ever passport */
+const EVER = [
+ {img:10, q:'Have you ever traveled by ferry?', yes:'I have traveled by ferry.', no:'I haven’t traveled by ferry.', st:'FERRY'},
+ {img:3, q:'Have you ever taken a train?', yes:'I have taken a train.', no:'I haven’t taken a train.', st:'TRAIN'},
+ {img:2, q:'Have you ever used a ticket machine?', yes:'I have used a ticket machine.', no:'I haven’t used a ticket machine.', st:'TICKET'},
+ {img:9, q:'Have you ever been to an airport?', yes:'I have been to an airport.', no:'I haven’t been to an airport.', st:'AIRPORT'},
+ {img:6, q:'Have you ever pushed a luggage cart?', yes:'I have pushed a luggage cart.', no:'I haven’t pushed a luggage cart.', st:'LUGGAGE'},
+ {img:13, q:'Have you ever been on a long journey?', yes:'I have been on a long journey.', no:'I haven’t been on a long journey.', st:'JOURNEY'}];
+const ans = {};
+$('#everList').innerHTML = EVER.map((e, i) => `<div class="ever"><img src="${IMG[e.img]}" alt=""><div style="display:flex;flex-direction:column;gap:8px"><span class="q">${esc(e.q)}</span>
+  <span class="row"><button class="opt" data-e="${i}" data-a="yes">Yes, I have.</button><button class="opt" data-e="${i}" data-a="no">No, I haven’t.</button><button class="play sm" data-say="${esc(plain(e.q))}" aria-label="Listen">▶</button></span></div></div>`).join('');
+function drawPassport(){
+  const yes = EVER.filter((e, i) => ans[i] === 'yes');
+  $('#stamps').innerHTML = yes.length ? yes.map(e => `<span class="stamp">✓<br>${e.st}</span>`).join('') : '<span class="mysent">No stamps yet.</span>';
+  $('#mySent').innerHTML = EVER.map((e, i) => ans[i] ? `<div>${esc(ans[i] === 'yes' ? e.yes : e.no)}</div>` : '').join('');
+}
+document.querySelectorAll('[data-e]').forEach(b => b.onclick = () => {
+  const i = +b.dataset.e; ans[i] = b.dataset.a;
+  document.querySelectorAll(`[data-e="${i}"]`).forEach(x => x.classList.toggle('right', x === b));
+  say(b.textContent); drawPassport();
+});
+$('#sayMine').onclick = e => { const t = EVER.map((x, i) => ans[i] ? (ans[i] === 'yes' ? x.yes : x.no) : '').filter(Boolean).join(' '); if (t) say(t, e.currentTarget); };
+
+/* simple past practice */
+const SP = [
+ {html:`She ${B} the train yesterday.`, opts:['took','taken','take'], ans:'took', full:'She took the train yesterday.', why:'Yesterday → simple past: took.'},
+ {html:`We ${B} by ferry last summer.`, opts:['traveled','have traveled','travel'], ans:'traveled', full:'We traveled by ferry last summer.', why:'Last summer → simple past.'},
+ {html:`I ${B} a ticket at the ticket machine.`, opts:['bought','buyed','buy'], ans:'bought', full:'I bought a ticket at the ticket machine.', why:'Buy is irregular: bought.'},
+ {html:`They didn’t ${B} the train.`, opts:['take','took','taken'], ans:'take', full:"They didn't take the train.", why:'After didn’t → base form: take.'},
+ {html:`${B} you go to the airport last week?`, opts:['Did','Have','Do'], ans:'Did', full:'Did you go to the airport last week?', why:'Last week → Did… ?'},
+ {html:`He didn’t ${B} in the waiting room.`, opts:['wait','waited','waits'], ans:'wait', full:"He didn't wait in the waiting room.", why:'After didn’t → base form: wait.'},
+ {html:`When ${B} you take the ferry?`, opts:['did','have','do'], ans:'did', full:'When did you take the ferry?', why:'Asking about the time → When did…?'},
+ {html:`The passengers ${B} to Cancún two days ago.`, opts:['flew','flown','fly'], ans:'flew', full:'The passengers flew to Cancún two days ago.', why:'Two days ago → simple past: flew.'}];
+choiceList($('#spList'), SP, $('#spScore'), 8);
+
+/* time clues */
+const TC = [['ever','pp'],['never','pp'],['before','pp'],['for five years','pp'],['in my life','pp'],['yesterday','sp'],['last summer','sp'],['two days ago','sp'],['in 2024','sp'],['When…?','sp']];
+let tcOk = 0;
+$('#clues').innerHTML = shuffle(TC).map(([c, a]) => `<div class="clue-chip" data-a="${a}"><b>${esc(c)}</b><span class="row"><button class="opt" data-t="pp" style="color:var(--pp)">Present perfect</button><button class="opt" data-t="sp" style="color:var(--sp)">Simple past</button></span></div>`).join('');
+document.querySelectorAll('.clue-chip').forEach(ch => ch.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+  const right = b.dataset.t === ch.dataset.a;
+  ch.querySelectorAll('.opt').forEach(x => { x.disabled = true; if (x.dataset.t === ch.dataset.a) x.classList.add('right'); });
+  if (right) { tcOk++; ch.classList.add('good'); } else b.classList.add('wrong');
+  $('#tcScore').textContent = `${tcOk} / 10`;
+}));
+
+/* conversations */
+const CV = [
+ {html:`“Have you ever been on a ferry?” “Yes, I ${B} on one last year.”`, opts:['was','have been'], ans:'was', full:'Have you ever been on a ferry? Yes, I was on one last year.', why:'Last year → simple past.'},
+ {html:`“Have you ever flown on a plane?” “No, I ${B}.”`, opts:['haven’t','didn’t'], ans:'haven’t', full:"Have you ever flown on a plane? No, I haven't.", why:'Have you ever…? → No, I haven’t.'},
+ {html:`“${B} you take the train yesterday?” “Yes, I did.”`, opts:['Did','Have'], ans:'Did', full:'Did you take the train yesterday? Yes, I did.', why:'Yesterday → Did…?'},
+ {html:`“Has your sister ever used a ticket machine?” “Yes, she ${B}.”`, opts:['has','did'], ans:'has', full:'Has your sister ever used a ticket machine? Yes, she has.', why:'Has… ever? → Yes, she has.'},
+ {html:`I ${B} to the airport many times.`, opts:['have been','went yesterday'], ans:'have been', full:"I have been to the airport many times.", why:'Many times, no exact time → present perfect.'},
+ {html:`We ${B} our tickets two hours ago.`, opts:['bought','have bought'], ans:'bought', full:'We bought our tickets two hours ago.', why:'Two hours ago → simple past.'}];
+choiceList($('#cvList'), CV, $('#cvScore'), 6);
+
+/* story */
+const STORY = [
+ 'Hi! I’m Mia. I ', ['p','have traveled'], ' by train many times, but I ', ['p','have never been'], ' on a plane. Last summer, my family and I ', ['s','took'], ' a ferry to Cozumel. ',
+ 'First, we ', ['s','bought'], ' our tickets at the ticket machine. Then we ', ['s','sat'], ' in the waiting room for twenty minutes. The ferry ', ['s','was'], ' big and white. ',
+ 'A ticket collector ', ['s','checked'], ' our tickets. The journey ', ['s','took'], ' forty-five minutes. I ', ['s','loved'], ' it! Now I want to take a plane. ', ['p','Have'], ' you ever ', ['p','been'], ' on a ferry?'];
+$('#storyText').innerHTML = '<p>' + STORY.map(x => typeof x === 'string' ? esc(x) : `<span class="v ${x[0]}">${esc(x[1])}</span>`).join('') + '</p>';
+const storyPlain = STORY.map(x => typeof x === 'string' ? x : x[1]).join('');
+$('#storySay').onclick = e => say(storyPlain, e.currentTarget);
+$('#storyShow').onclick = e => { const on = $('#storyText').classList.toggle('show'); e.currentTarget.setAttribute('aria-pressed', on); e.currentTarget.textContent = on ? 'Hide the grammar' : 'Show the grammar'; };
+const ST = [
+ {html:'Mia has been on a plane.', ans:'False', why:'She has never been on a plane.'},
+ {html:'Mia’s family took a ferry last summer.', ans:'True', why:'Last summer, they took a ferry to Cozumel.'},
+ {html:'They bought tickets at the check-in desk.', ans:'False', why:'They bought them at the ticket machine.'},
+ {html:'They waited in the waiting room.', ans:'True', why:'They sat in the waiting room for twenty minutes.'},
+ {html:'A ticket collector checked their tickets.', ans:'True', why:'Yes, a ticket collector checked them.'},
+ {html:'The journey took two hours.', ans:'False', why:'It took forty-five minutes.'}];
+choiceList($('#stList'), ST.map(s => ({...s, opts:['True','False']})), $('#stScore'), 6);
+
+/* interview */
+const IV = [
+ ['Have you ever traveled by ferry?','When did you travel by ferry?','Yes, I have. I traveled by ferry last…'],
+ ['Have you ever taken a train?','When did you take a train?','Yes, I have. I took a train in…'],
+ ['Have you ever been to an airport?','Which airport did you go to?','Yes, I have. I went to … airport.'],
+ ['Have you ever waited in a long line?','Where did you wait?','Yes, I have. I waited in a line at…'],
+ ['Have you ever been on a long journey?','Where did you go?','Yes, I have. Last year, I went to…'],
+ ['Have you ever used a ticket machine?','What ticket did you buy?','No, I haven’t. / Yes, I bought a ticket for…']];
+$('#ivGrid').innerHTML = IV.map(([a, b, c], i) => `<div class="card" id="iv${i}"><span class="label">Question ${i + 1}</span><span class="ex" style="font-size:21px"><span class="pp">${esc(a)}</span></span><span>If yes: <span class="sp"><b>${esc(b)}</b></span></span><span class="es">${esc(c)}</span><button class="play sm" data-say="${esc(plain(a + ' ' + b))}">▶ Listen</button></div>`).join('');
+$('#pick').onclick = () => { document.querySelectorAll('#ivGrid .card').forEach(c => c.classList.remove('pick')); const i = Math.floor(Math.random() * IV.length); $('#iv' + i).classList.add('pick'); $('#iv' + i).scrollIntoView({block:'nearest', behavior:'smooth'}); say(IV[i][0]); };
+})();
+</script>
+
+</body></html>
