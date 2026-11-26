@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>The Unlikely Knight – Reading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merienda:wght@700;800&family=Nunito:wght@600;800;900&display=swap">
+<style>
+:root{
+  --bg:#F7F1E3; --surface:#FFFDF7; --surface-2:#EFE6D2; --ink:#2B2216; --ink-soft:#6A5B45; --line:#DCCFB4;
+  --royal:#26468C; --royal-ink:#FFF8E8; --red:#B5302A; --gold:#D9A21B; --gold-soft:#FBEFC8; --green:#5E8C2E; --green-bg:#E7F2D8;
+  --good:#1F7A3A; --good-bg:#DDF2E3; --bad:#B3261E; --bad-bg:#FBE3E1;
+  --display:'Merienda',Georgia,serif; --body:'Nunito','Segoe UI',Verdana,sans-serif; --r:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:600;font-size:clamp(18px,1.5vw,23px);line-height:1.45;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;overscroll-behavior:none;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;border:0;cursor:pointer;touch-action:manipulation;background:none}
+h1,h2,h3{font-family:var(--display);font-weight:800;margin:0;line-height:1.15}
+.top{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--royal);color:var(--royal-ink);flex-wrap:wrap;border-bottom:5px solid var(--gold)}
+.top h1{font-size:clamp(22px,2.2vw,32px);margin-right:auto;white-space:nowrap}
+.top h1 span{color:var(--gold)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{min-height:56px;padding:6px 16px;border-radius:999px;background:rgba(255,255,255,.13);color:var(--royal-ink);font-weight:800;display:flex;align-items:center;gap:8px}
+.tab .n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.22);font-size:.85em}
+.tab[aria-selected=true]{background:var(--gold);color:#2B1C00}
+.tab[aria-selected=true] .n{background:#2B1C00;color:var(--gold)}
+.stars{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.22);padding:6px 16px;border-radius:999px;font-weight:900;font-size:1.15em;min-height:56px}
+.iconbtn{min-width:56px;min-height:56px;border-radius:50%;background:rgba(255,255,255,.13);color:var(--royal-ink);font-size:24px;display:grid;place-items:center}
+main{flex:1;min-height:0;overflow:auto;padding:16px}
+section{display:none;max-width:1400px;margin:0 auto}
+section.on{display:block;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.instr{display:flex;align-items:baseline;gap:14px;margin:0 0 14px;flex-wrap:wrap}
+.instr h2{font-size:clamp(24px,2.4vw,36px);color:var(--royal)}
+.instr p{margin:0;color:var(--ink-soft)}
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:18px}
+.panel h3{font-size:1.15em;color:var(--red);margin-bottom:8px}
+.hint{font-size:.88em;color:var(--ink-soft);margin:0 0 10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:8px 20px;border-radius:999px;background:var(--surface);border:2px solid var(--line);font-weight:800}
+.pill.primary{background:var(--royal);color:var(--royal-ink);border-color:var(--royal)}
+.pill.gold{background:var(--gold);border-color:var(--gold);color:#2B1C00}
+.pill:active,.chip:active,.opt:active,.tab:active{transform:scale(.96)}
+.chip{min-height:56px;padding:8px 16px;border-radius:14px;background:var(--surface-2);border:3px solid var(--line);font-weight:800;touch-action:none}
+.chip.sel{background:var(--royal);color:#fff;border-color:var(--royal)}
+.chip.on{background:var(--gold-soft);border-color:var(--gold)}
+.chip.yes{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.chip.miss{border-style:dashed;border-color:var(--good);color:var(--good)}
+.opt{min-height:60px;border-radius:16px;background:var(--surface-2);border:3px solid var(--line);font-weight:900;padding:10px 16px;text-align:left}
+.opt.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.opt.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad);animation:shake .45s}
+.opt.pick{background:var(--gold-soft);border-color:var(--gold)}
+.shake{animation:shake .45s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes pop{from{transform:scale(.3)}to{transform:scale(1)}}
+.ideas{display:flex;flex-wrap:wrap;gap:10px}
+.idea{min-height:56px;padding:8px 16px;border-radius:14px;background:var(--surface-2);border:3px dashed var(--line);font-weight:800;color:transparent;position:relative;min-width:150px}
+.idea::after{content:"❓ Tap for an idea";position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-soft);font-size:.9em}
+.idea.open{color:var(--ink);border-style:solid;border-color:var(--gold);background:var(--gold-soft);animation:pop .35s}
+.idea.open::after{display:none}
+.predict{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.pcard{background:var(--surface-2);border:4px solid var(--line);border-radius:20px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px;font-weight:900;text-align:center;min-height:150px;justify-content:center}
+.pcard .e{font-size:2.4em;line-height:1}
+.pcard.pick{border-color:var(--gold);background:var(--gold-soft)}
+.pcard.ok{border-color:var(--good);background:var(--good-bg);color:var(--good)}
+
+/* story */
+.book{display:flex;flex-direction:column;gap:18px;max-width:1150px;margin:0 auto}
+.page{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px;align-items:start;background:var(--surface);border:2px solid var(--line);border-radius:24px;padding:18px}
+.page.flip{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr)}
+.page.flip .pic{order:-1}
+.page.solo{grid-template-columns:1fr}
+.pic img{width:100%;border-radius:16px;display:block;box-shadow:0 8px 24px rgba(60,40,10,.2)}
+.para{display:block;width:100%;text-align:left;padding:10px 14px;border-radius:14px;margin-bottom:8px;border:3px solid transparent;font-weight:700;font-size:1.04em}
+.page:first-child .para:first-child::first-letter{font-family:var(--display);font-size:2.6em;float:left;line-height:.9;margin:4px 8px 0 0;color:var(--red)}
+.para.playing{background:var(--gold-soft);border-color:var(--gold)}
+.para b{color:var(--red);font-weight:900}
+.para q{quotes:"“" "”";color:var(--royal)}
+.poemcard{background:var(--gold-soft);border-radius:16px;padding:12px 18px;font-style:italic;font-weight:800;margin:0 0 8px;border-left:8px solid var(--gold)}
+.poemcard span{display:block}
+.storybar{position:sticky;top:-16px;z-index:5;background:var(--bg);padding:8px 0 10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* poem tab */
+.poem{display:flex;flex-direction:column;gap:12px}
+.verse{background:var(--surface);border:3px solid var(--line);border-radius:18px;padding:10px 16px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center}
+.verse .vn{grid-row:span 2;width:48px;height:48px;border-radius:50%;background:var(--royal);color:#fff;display:grid;place-items:center;font-family:var(--display);font-size:1.3em}
+.pl{font-style:italic;font-weight:800;font-size:1.08em}
+.rep{border-radius:8px;padding:2px 4px;cursor:pointer}
+.rep.found{background:#CFE0FF;color:var(--royal);outline:3px solid var(--royal)}
+.rw{display:inline-block;min-height:44px;line-height:40px;padding:0 10px;border-radius:12px;border:3px dashed var(--line);cursor:pointer;font-style:normal;font-weight:900;margin-left:4px}
+.rw.sel{border-style:solid;border-color:var(--gold);background:var(--gold-soft)}
+.rw.ok{border-style:solid;border-color:var(--c);background:var(--c);color:#fff;animation:pop .35s}
+.tasks{display:grid;gap:14px}
+.task{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:14px 16px}
+.task h4{margin:0 0 8px;font-size:1.02em;display:flex;gap:10px;align-items:center}
+.task h4 .n{flex:none;width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center}
+.task h4 .st{margin-left:auto;font-size:1.4em}
+.task .opts{display:flex;gap:10px;flex-wrap:wrap}
+.task .opt{min-width:80px;text-align:center}
+
+/* features */
+.cards{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:70px;margin-bottom:16px}
+.bins{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.bin{border-radius:20px;border:4px dashed var(--line);padding:12px;min-height:250px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.bin h4{margin:0 0 4px;font-family:var(--display);font-size:1.3em;display:flex;gap:8px;align-items:center}
+.bin.story h4{color:var(--royal)} .bin.poem h4{color:var(--red)} .bin.both h4{color:var(--green)}
+.picking .bin{border-color:var(--gold);background:var(--gold-soft)}
+.bin.on{background:#E6EEFF!important}
+.bin .chip{background:var(--good-bg);border-color:var(--good);color:var(--good);min-height:48px}
+.ghost{position:fixed;z-index:50;pointer-events:none;transform:translate(-50%,-50%) scale(1.06);opacity:.95;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+
+/* check */
+.seq{display:flex;flex-direction:column;gap:10px}
+.ev{display:flex;align-items:center;gap:12px;text-align:left;min-height:60px;padding:8px 14px;border-radius:16px;background:var(--surface-2);border:3px solid var(--line);font-weight:800}
+.ev .num{flex:none;width:42px;height:42px;border-radius:50%;border:3px dashed var(--ink-soft);display:grid;place-items:center;font-family:var(--display)}
+.ev.ok{background:var(--good-bg);border-color:var(--good)}
+.ev.ok .num{background:var(--good);color:#fff;border-style:solid;border-color:var(--good);animation:pop .35s}
+.adv{display:flex;flex-direction:column;gap:12px}
+.arow{background:var(--surface-2);border-radius:16px;padding:10px 14px}
+.arow p{margin:0 0 8px;font-weight:800}
+.arow .gap{display:inline-block;min-width:110px;border-bottom:3px solid var(--ink-soft);text-align:center;color:var(--red);font-weight:900}
+.arow .opts{display:flex;gap:8px;flex-wrap:wrap}
+.arow .opt{min-height:52px;padding:4px 14px;text-align:center}
+.mypoem{background:var(--gold-soft);border:3px solid var(--gold);border-radius:18px;padding:16px;font-style:italic;font-weight:900;font-size:1.2em;min-height:120px}
+.mypoem span{display:block}
+.badge{width:120px;height:120px;border-radius:50%;border:6px double var(--red);display:grid;place-items:center;text-align:center;font-weight:900;color:var(--red);font-size:.8em;transform:rotate(-8deg);background:#fff;flex:none;line-height:1.15;padding:10px}
+
+.overlay{position:fixed;inset:0;background:rgba(30,20,5,.5);display:none;place-items:center;z-index:80}
+.overlay.on{display:grid}
+.obox{background:var(--surface);border-radius:28px;padding:34px 44px;text-align:center;max-width:90vw;animation:pop .5s cubic-bezier(.3,1.6,.5,1);border:6px solid var(--gold)}
+.obox .big{font-family:var(--display);font-size:clamp(36px,5vw,66px);color:var(--royal);line-height:1.1}
+.obox p{font-size:1.2em;margin:12px 0 20px}
+.confetti{position:fixed;top:-20px;width:12px;height:18px;z-index:90;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@media (max-width:1050px){.two,.page,.page.flip{grid-template-columns:1fr}.page.flip .pic{order:0}.predict,.bins{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>🛡️ The Unlikely <span>Knight</span></h1>
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-go="s1"><span class="n">1</span>Before</button>
+    <button class="tab" role="tab" aria-selected="false" data-go="s2"><span class="n">2</span>Read</button>
+    <button class="tab" role="tab" aria-selected="false" data-go="s3"><span class="n">3</span>Poem</button>
+    <button class="tab" role="tab" aria-selected="false" data-go="s4"><span class="n">4</span>Features</button>
+    <button class="tab" role="tab" aria-selected="false" data-go="s5"><span class="n">5</span>Check</button>
+  </nav>
+  <div class="stars" aria-live="polite">⭐ <span id="stars">0</span></div>
+  <button class="iconbtn" id="fs" title="Full screen" aria-label="Full screen">⛶</button>
+</header>
+<main>
+
+<!-- 1 BEFORE YOU READ -->
+<section id="s1" class="on">
+  <div class="instr"><h2>Before you read</h2><p>Think and discuss with your class.</p></div>
+  <div class="two">
+    <div class="panel">
+      <h3>1. Why do you think knights were important in medieval times?</h3>
+      <p class="hint">Say your ideas first. Then tap a card to see more ideas.</p>
+      <div class="ideas" id="ideas"></div>
+    </div>
+    <div class="panel">
+      <h3>2. What skills do you think a knight needed to have?</h3>
+      <p class="hint">Tap the skills you think. Check after you read the story! ✔</p>
+      <div class="ideas" id="skills"></div>
+      <div class="row" style="margin-top:12px"><button class="pill gold" id="checkSkills">📖 Check with the story</button><span id="skillMsg" style="font-weight:800"></span></div>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:18px">
+    <h3>3. Look at the title and the pictures. What do you think happens?</h3>
+    <div class="row" style="gap:14px;margin-bottom:14px;justify-content:center">
+      <img src="media/knight-arrives.jpg" alt="A knight on a horse talks to a poor boy" style="height:210px;border-radius:14px">
+      <img src="media/dream.jpg" alt="The boy works with oxen and dreams of being a knight" style="height:210px;border-radius:14px">
+      <img src="media/dream-true.jpg" alt="The boy is on the knight's horse and his family is happy" style="height:210px;border-radius:14px">
+    </div>
+    <div class="predict" id="predict"></div>
+    <p class="hint" style="margin-top:10px;text-align:center" id="predMsg">Choose one. Then read and check your idea in part 2!</p>
+  </div>
+</section>
+
+<!-- 2 READ -->
+<section id="s2">
+  <div class="storybar">
+    <h2 style="color:var(--royal);font-size:clamp(24px,2.4vw,36px);margin-right:auto">📖 Listen and read</h2>
+    <button class="pill primary" id="readAll">▶ Read to me</button>
+    <button class="pill" id="stopRead">⏹ Stop</button>
+  </div>
+  <p class="hint">Tap any paragraph to listen. The <b style="color:var(--red)">red words</b> tell us <i>how</i> people do things.</p>
+  <div class="book" id="book"></div>
+  <div class="panel" style="margin-top:18px;max-width:1150px;margin-inline:auto;text-align:center">
+    <h3>Check your idea! What happens in the story?</h3>
+    <div class="predict" id="predict2" style="margin-top:10px"></div>
+    <p id="pred2Msg" style="font-weight:900;margin:12px 0 0"></p>
+  </div>
+</section>
+
+<!-- 3 POEM -->
+<section id="s3">
+  <div class="instr"><h2>Walter's poem</h2><p>Read and discuss. Tap 🔊 to listen.</p></div>
+  <div class="two">
+    <div>
+      <div class="row" style="margin-bottom:12px"><button class="pill primary" id="readPoem">🔊 Listen to the poem</button></div>
+      <div class="poem" id="poem"></div>
+    </div>
+    <div class="tasks">
+      <div class="task"><h4><span class="n">1</span>How many verses are there in Walter's poem?<span class="st" id="t1"></span></h4><div class="opts" id="q1"></div></div>
+      <div class="task"><h4><span class="n">2</span>Which words rhyme in each verse?<span class="st" id="t2"></span></h4><p class="hint" style="margin:0">Tap the two dashed words that rhyme in a verse. <b id="rhymeCount">0/5</b></p></div>
+      <div class="task"><h4><span class="n">3</span>Which sentence is repeated in each verse?<span class="st" id="t3"></span></h4><p class="hint" style="margin:0">Tap it in the poem. <b id="repMsg"></b></p></div>
+      <div class="task"><h4><span class="n">4</span>Do you think Walter's poem has a storyline? Why / Why not?</h4>
+        <p class="hint">💡 A storyline has a <b>beginning</b>, a <b>middle</b>, and an <b>end</b>.</p>
+        <div class="opts" id="q4"></div>
+        <p id="q4msg" style="font-weight:800;margin:10px 0 0;color:var(--royal)"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 FEATURES -->
+<section id="s4">
+  <div class="instr"><h2>Identify the features of stories and poems</h2><p>Tap a card, then tap the box. (Or drag it!)</p></div>
+  <div class="cards" id="fcards"></div>
+  <div class="bins" id="bins">
+    <div class="bin story" data-b="story"><h4>📖 A story</h4></div>
+    <div class="bin poem" data-b="poem"><h4>📜 A poem</h4></div>
+    <div class="bin both" data-b="both"><h4>🤝 Both</h4></div>
+  </div>
+</section>
+
+<!-- 5 CHECK -->
+<section id="s5">
+  <div class="instr"><h2>Story check</h2><p>Show what you understood!</p></div>
+  <div class="two">
+    <div class="panel">
+      <h3>Put the story in order</h3>
+      <p class="hint">Tap the events from first to last.</p>
+      <div class="seq" id="seq"></div>
+      <div class="row" style="margin-top:10px"><button class="pill" id="resetSeq">↺ Start again</button></div>
+    </div>
+    <div class="panel">
+      <h3>How did they do it?</h3>
+      <p class="hint">Choose the word from the story.</p>
+      <div class="adv" id="adv"></div>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:18px">
+    <div class="row" style="align-items:flex-start;gap:18px">
+      <div class="badge">⭐ I present myself positively ⭐</div>
+      <div style="flex:1;min-width:260px">
+        <h3>My poem — I know I can do it!</h3>
+        <p class="hint">Be like Walter! Choose two things you can do and read your poem to the class.</p>
+        <div class="ideas" id="cando" style="margin-bottom:12px"></div>
+        <div class="mypoem" id="mypoem"></div>
+        <div class="row" style="margin-top:10px"><button class="pill gold" id="sayPoem">🔊 Listen</button><button class="pill" id="clearPoem">↺ Clear</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="overlay" id="ov"><div class="obox"><div class="big" id="ovBig"></div><p id="ovTxt"></p><button class="pill primary" id="ovClose">OK ✔</button></div></div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+let stars=0;const addStar=(n=1)=>{stars+=n;$('#stars').textContent=stars};
+let ac;function tone(fs,dur=.12,type='sine',vol=.15){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();let t=ac.currentTime;fs.forEach(f=>{const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+dur);t+=dur*.9})}catch(e){}}
+const good=()=>tone([660,880,1100],.11,'triangle'),bad=()=>tone([220,180],.16,'square',.07);
+let voices=[];function loadVoices(){voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang))}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+function voice(){const us=voices.filter(v=>/en-US/i.test(v.lang));const p=us.length?us:voices;return p.find(v=>/female|zira|jenny|aria|samantha|google us/i.test(v.name))||p[0]}
+let speakId=0;
+function speak(text,rate=.85,onend){if(!('speechSynthesis' in window)){onend&&onend();return}speechSynthesis.cancel();const id=++speakId;const u=new SpeechSynthesisUtterance(text);u.lang='en-US';const v=voice();if(v)u.voice=v;u.rate=rate;u.onend=()=>{if(id===speakId&&onend)onend()};speechSynthesis.speak(u)}
+function stopSpeak(){speakId++;window.speechSynthesis&&speechSynthesis.cancel()}
+function confetti(){const cs=['#26468C','#D9A21B','#B5302A','#5E8C2E','#fff'];for(let i=0;i<70;i++){const d=document.createElement('div');d.className='confetti';d.style.left=Math.random()*100+'vw';d.style.background=cs[i%5];d.style.animationDuration=(1.8+Math.random()*1.8)+'s';d.style.animationDelay=Math.random()*.5+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),4200)}tone([523,659,784,1046],.16,'triangle')}
+function overlay(big,txt){$('#ovBig').textContent=big;$('#ovTxt').textContent=txt;$('#ov').classList.add('on');confetti()}
+$('#ovClose').onclick=()=>$('#ov').classList.remove('on');
+$$('.tab').forEach(t=>t.onclick=()=>{$$('.tab').forEach(x=>x.setAttribute('aria-selected',x===t));$$('section').forEach(s=>s.classList.toggle('on',s.id===t.dataset.go));$('main').scrollTop=0;stopSpeak();$$('.playing').forEach(x=>x.classList.remove('playing'))});
+$('#fs').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{})};
+document.addEventListener('contextmenu',e=>e.preventDefault());
+const plain=html=>html.replace(/<[^>]+>/g,'');
+
+/* ===== 1 BEFORE ===== */
+['🏰 They protected the castle and the king.','⚔️ They fought in battles.','🛡️ They kept the people safe.','🐴 They traveled and carried messages.'].forEach(t=>{
+  const b=document.createElement('button');b.className='idea';b.textContent=t;b.onclick=()=>{if(!b.classList.contains('open')){b.classList.add('open');speak(t.replace(/^\S+\s/,''))}};$('#ideas').appendChild(b)});
+const SKILLS=[['🐴 ride a horse',1],['📖 read',1],['✍️ write',1],['💃 dance',1],['🎵 sing',1],['💪 be brave',1],['🧠 be intelligent',1],['💛 be kind',1],['📜 write poems',1],['🍳 cook',0],['⚽ play soccer',0],['🚗 drive',0]];
+shuffle(SKILLS).forEach(([t,inStory])=>{const b=document.createElement('button');b.className='chip';b.textContent=t;b.dataset.s=inStory;b.style.touchAction='manipulation';
+  b.onclick=()=>{if($('#skills').classList.contains('checked'))return;b.classList.toggle('on');speak(t.replace(/^\S+\s/,''))};$('#skills').appendChild(b)});
+$('#checkSkills').onclick=()=>{const box=$('#skills');if(box.classList.contains('checked')){box.classList.remove('checked');$$('#skills .chip').forEach(c=>c.classList.remove('yes','miss','shake'));$('#skillMsg').textContent='';$('#checkSkills').textContent='📖 Check with the story';return}
+  box.classList.add('checked');let hit=0;$$('#skills .chip').forEach(c=>{const on=c.classList.contains('on'),s=c.dataset.s==='1';if(on&&s){c.classList.add('yes');hit++}else if(!on&&s)c.classList.add('miss');else if(on&&!s)c.classList.add('shake')});
+  if(hit)addStar(hit);$('#skillMsg').textContent='✔ '+hit+' of 9 skills are in the story!';$('#checkSkills').textContent='↺ Try again';good()};
+const PRED=[['🛡️','Walter becomes a knight.',true],['🐂','Walter stays on the farm forever.',false],['🏃','Walter runs away from the village.',false]];
+let myPred=null;
+function buildPred(box,checking){PRED.forEach(([e,t,ok],i)=>{const b=document.createElement('button');b.className='pcard';b.innerHTML='<span class="e">'+e+'</span>'+t;
+  b.onclick=()=>{if(checking){if(b.classList.contains('ok'))return;if(ok){b.classList.add('ok');good();addStar();$('#pred2Msg').textContent=myPred===null?'Yes! His dream comes true! 🎉':(myPred===i?'Your idea was right! 🎉':'Good guess! But the answer is: '+t)}else{b.classList.add('shake');bad();setTimeout(()=>b.classList.remove('shake'),450)}}
+    else{myPred=i;$$('#predict .pcard').forEach(x=>x.classList.toggle('pick',x===b));$('#predMsg').textContent='Your idea: “'+t+'” Now go to part 2 and read! 📖';speak(t)}};box.appendChild(b)})}
+buildPred($('#predict'),false);buildPred($('#predict2'),true);
+
+/* ===== 2 STORY ===== */
+const POEM=[["I know I can do it. I can be kind.","I give my mom all the berries I find."],["I know I can do it. I can learn to read.","In the fields, one by one, I plant every seed."],["I know I can do it. I can learn to ride.","I plow the cornfields with an ox by my side."],["I know I can do it. I can learn to fight.","I chop wood with a heavy axe every night."],["I know I can do it. I can be a knight.","I thought of this poem to show you I'm right!"]];
+const PAGES=[
+ {img:'knight-arrives.jpg',alt:'The knight on his horse and Walter',paras:[
+  "Walter was a normal boy who lived with his family in a small hut. They were poor and they had to work hard in the fields every day. Walter didn't go to school. He dreamed of a different life, full of exciting adventures, but he didn't know how to make his dreams come true.",
+  "One day, a knight rode into Walter's village. The knight looked very different from everyone there. He was wearing colorful, expensive clothes, and his horse was big and strong. Walter suddenly knew what he wanted to do. He ran up to the knight and said, <q>Please, Sir, I want to be a knight like you!</q>",
+  "The knight laughed <b>kindly</b> and said, <q>I'm sorry, that won't be possible. Knights have to do special training to learn how to ride a horse and to read, write, dance, and sing. Then they have to pay for their horse and equipment.</q>"]},
+ {img:'dream.jpg',alt:'Walter works in the fields with oxen and dreams of being a knight',flip:true,paras:[
+  "Walter was disappointed, but he didn't give up. <q>And what do you have to do when you're a knight, Sir?</q> he asked.",
+  "<q>Well,</q> said the knight, <q>you have to be brave and intelligent, but also kind. And you have to write poems about your adventures!</q>",
+  "Walter watched <b>sadly</b> as the knight rode away. Soon his dad called him back to work. He plowed the fields until late that night, but he couldn't stop thinking about the knight's words.",
+  "The next morning, the knight passed through the village again on his way back to the castle. He saw Walter running toward him and stopped. <q>So, you still think you can be a knight?</q> he asked."]},
+ {img:'dream-true.jpg',alt:'Walter on the horse. His family is happy.',paras:[
+  "<q>I don't think I can, I <i>know</i> I can!</q> said Walter, and he continued <b>bravely</b>:",
+  "POEM",
+  "The knight was so surprised that he almost fell off his horse.",
+  "<q>If you can think of a poem like that and work at the same time, you'll be a great knight one day!</q> he said. <q>I can take you to the castle right now to begin your training!</q>",
+  "Walter's parents hugged their son <b>happily</b>. Then Walter <b>quickly</b> jumped onto the horse and waved goodbye. His dream had finally come true!"]}];
+PAGES.forEach(p=>{const pg=document.createElement('div');pg.className='page'+(p.flip?' flip':'');
+  const txt=document.createElement('div');
+  p.paras.forEach(h=>{const b=document.createElement('button');b.className='para';
+    if(h==='POEM'){b.classList.add('poemcard');b.innerHTML=POEM.flat().map(l=>'<span>'+l+'</span>').join('');b.dataset.say=POEM.flat().join(' ')}
+    else{b.innerHTML=h;b.dataset.say=plain(h)}
+    b.onclick=()=>{readFrom(b,false)};txt.appendChild(b)});
+  pg.appendChild(txt);pg.insertAdjacentHTML('beforeend','<div class="pic"><img src="media/'+p.img+'" alt="'+p.alt+'"></div>');$('#book').appendChild(pg)});
+function readFrom(b,cont){$$('.para').forEach(x=>x.classList.remove('playing'));b.classList.add('playing');b.scrollIntoView({behavior:'smooth',block:'center'});
+  speak(b.dataset.say,.85,()=>{b.classList.remove('playing');if(cont){const all=$$('.para');const n=all[all.indexOf(b)+1];if(n)setTimeout(()=>readFrom(n,true),350)}})}
+$('#readAll').onclick=()=>readFrom($$('.para')[0],true);
+$('#stopRead').onclick=()=>{stopSpeak();$$('.para').forEach(x=>x.classList.remove('playing'))};
+
+/* ===== 3 POEM ===== */
+const RCOL=['#26468C','#B5302A','#5E8C2E','#9A5BB5','#C77B12'];
+POEM.forEach((v,vi)=>{const d=document.createElement('div');d.className='verse';
+  const mk=(line,li)=>{const m=line.match(/^(.*?)(\w+)([.!?']*)$/);let start=m[1],w=m[2],end=m[3];
+    if(li===0)start=start.replace("I know I can do it.",'<span class="rep">I know I can do it.</span>');
+    return '<div class="pl">'+start+'<span class="rw" data-v="'+vi+'">'+w+'</span>'+end+'</div>'};
+  d.innerHTML='<div class="vn">'+(vi+1)+'</div>'+mk(v[0],0)+mk(v[1],1);$('#poem').appendChild(d)});
+let selRw=null,rhymes=0,reps=0;
+$('#poem').addEventListener('click',e=>{const r=e.target.closest('.rw'),p=e.target.closest('.rep');
+  if(p){if(p.classList.contains('found'))return;$$('.rep').forEach(x=>x.classList.add('found'));good();addStar();speak('I know I can do it.');$('#repMsg').textContent='“I know I can do it.” ✔';$('#t3').textContent='✅';return}
+  if(!r||r.classList.contains('ok'))return;
+  if(!selRw){selRw=r;r.classList.add('sel');speak(r.textContent);return}
+  if(selRw===r){r.classList.remove('sel');selRw=null;return}
+  if(selRw.dataset.v===r.dataset.v){const c=RCOL[+r.dataset.v];[selRw,r].forEach(x=>{x.classList.remove('sel');x.classList.add('ok');x.style.setProperty('--c',c)});speak(selRw.textContent+', '+r.textContent);selRw=null;good();addStar();rhymes++;$('#rhymeCount').textContent=rhymes+'/5';if(rhymes===5){$('#t2').textContent='✅';setTimeout(()=>overlay('Great rhymes! 🎶','kind–find · read–seed · ride–side · fight–night · knight–right'),400)}}
+  else{bad();r.classList.add('shake');selRw.classList.remove('sel');const s=selRw;selRw=null;setTimeout(()=>r.classList.remove('shake'),450)}});
+['3','5','10'].forEach(n=>{const b=document.createElement('button');b.className='opt';b.textContent=n;b.onclick=()=>{if(n==='5'){b.classList.add('ok');good();addStar();$('#t1').textContent='✅';$$('#q1 .opt').forEach(x=>x.disabled=true);speak('There are five verses.')}else{b.classList.add('no');b.disabled=true;bad()}};$('#q1').appendChild(b)});
+[['👍 Yes, because…','Yes — it tells what Walter does and ends with “I can be a knight”. It shows his dream!'],['👎 No, because…','No — there is no beginning, middle, and end. It is a list of things Walter can do.']].forEach(([t,m])=>{const b=document.createElement('button');b.className='opt';b.textContent=t;b.onclick=()=>{$$('#q4 .opt').forEach(x=>x.classList.toggle('pick',x===b));$('#q4msg').textContent='💬 '+m+' What do you think?'};$('#q4').appendChild(b)});
+$('#readPoem').onclick=()=>{const vs=$$('.verse');let i=0;const next=()=>{vs.forEach(v=>v.style.borderColor='');if(i>=vs.length)return;const v=vs[i];v.style.borderColor='var(--gold)';speak(POEM[i++].join(' '),.8,()=>setTimeout(next,300))};next()};
+
+/* ===== 4 FEATURES ===== */
+const FEAT=[['sentences','story'],['paragraphs','story'],['direct speech 💬','story'],['verses','poem'],['rhyming words','poem'],['repetition 🔁','poem'],['characters 👦','both'],['a storyline (beginning, middle, end)','both']];
+let selF=null,fdone=0;
+function tapOrDrag(item,{onPick,getTarget,onDrop,onHover}){item.addEventListener('pointerdown',e=>{if(item.disabled)return;const sx=e.clientX,sy=e.clientY;let ghost=null,last=null;item.setPointerCapture(e.pointerId);
+  const move=ev=>{if(!ghost&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>12){ghost=item.cloneNode(true);ghost.classList.add('ghost');ghost.style.width=item.offsetWidth+'px';document.body.appendChild(ghost);onPick(item,true)}
+    if(ghost){ghost.style.left=ev.clientX+'px';ghost.style.top=ev.clientY+'px';const t=getTarget(ev.clientX,ev.clientY);if(t!==last){onHover(last,false);onHover(t,true);last=t}}};
+  const up=ev=>{item.removeEventListener('pointermove',move);item.removeEventListener('pointerup',up);item.removeEventListener('pointercancel',up);if(ghost){ghost.remove();onHover(last,false);const t=getTarget(ev.clientX,ev.clientY);if(t)onDrop(item,t)}else onPick(item,false)};
+  item.addEventListener('pointermove',move);item.addEventListener('pointerup',up);item.addEventListener('pointercancel',up)})}
+const binAt=(x,y)=>{for(const el of document.elementsFromPoint(x,y)){const b=el.closest&&el.closest('.bin');if(b)return b}return null};
+function unselF(){if(selF)selF.classList.remove('sel');selF=null;$('#bins').classList.remove('picking')}
+function dropF(c,bin){if(c.dataset.b===bin.dataset.b){unselF();c.disabled=true;c.style.touchAction='auto';bin.appendChild(c);good();addStar();if(++fdone===FEAT.length)setTimeout(()=>overlay('Well done! 📜','Stories and poems both have characters and a storyline.'),400)}
+  else{bad();c.classList.add('shake');setTimeout(()=>c.classList.remove('shake'),450)}}
+shuffle(FEAT).forEach(([t,b])=>{const c=document.createElement('button');c.className='chip';c.textContent=t;c.dataset.b=b;$('#fcards').appendChild(c);
+  tapOrDrag(c,{onPick:(it,drag)=>{if(!drag&&selF===it){unselF();return}unselF();selF=it;it.classList.add('sel');$('#bins').classList.add('picking');speak(t.replace(/[^\w\s,()]/g,''))},getTarget:binAt,onDrop:dropF,onHover:(t,on)=>t&&t.classList.toggle('on',on)})});
+$$('.bin').forEach(b=>b.addEventListener('click',()=>{if(selF)dropF(selF,b)}));
+
+/* ===== 5 CHECK ===== */
+const EVENTS=['Walter lives with his poor family and works in the fields.','A knight rides into the village.','Walter says, “I want to be a knight like you!”','The knight rides away and Walter feels sad.','Walter says his poem to the knight.','Walter goes to the castle to begin his training.'];
+let seqN=0;
+function buildSeq(){seqN=0;$('#seq').innerHTML='';shuffle(EVENTS.map((t,i)=>[t,i])).forEach(([t,i])=>{const b=document.createElement('button');b.className='ev';b.innerHTML='<span class="num"></span>'+t;
+  b.onclick=()=>{if(b.classList.contains('ok'))return;if(i===seqN){b.classList.add('ok');b.querySelector('.num').textContent=++seqN;good();addStar();speak(t);if(seqN===6)setTimeout(()=>overlay('The end! 🛡️','You put the story in order.'),400)}else{bad();b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),450)}};$('#seq').appendChild(b)})}
+$('#resetSeq').onclick=buildSeq;buildSeq();
+const ADV=[['The knight laughed','kindly','and said, “I’m sorry.”'],['Walter watched','sadly','as the knight rode away.'],['Walter continued','bravely','with his poem.'],['Walter’s parents hugged him','happily','before he left.'],['Walter','quickly','jumped onto the horse.']];
+const ALLADV=['kindly','sadly','bravely','happily','quickly'];
+ADV.forEach(([a,w,b])=>{const r=document.createElement('div');r.className='arow';r.innerHTML='<p>'+a+' <span class="gap">&nbsp;</span> '+b+'</p><div class="opts"></div>';
+  const opts=shuffle([w,...shuffle(ALLADV.filter(x=>x!==w)).slice(0,2)]);
+  opts.forEach(o=>{const btn=document.createElement('button');btn.className='opt';btn.textContent=o;btn.onclick=()=>{if(o===w){btn.classList.add('ok');r.querySelector('.gap').textContent=w;r.querySelectorAll('.opt').forEach(x=>x.disabled=true);good();addStar();speak((a+' '+w+' '+b).replace(' .','.'))}else{btn.classList.add('no');btn.disabled=true;bad()}};r.querySelector('.opts').appendChild(btn)});
+  $('#adv').appendChild(r)});
+const CAN=['be kind','help my friends','learn to swim','play soccer','sing a song','ride a bike','read a book','draw a dragon'];
+let mine=[];
+function drawPoem(){$('#mypoem').innerHTML=mine.length?mine.map(c=>'<span>I know I can do it. I can '+c+'.</span>').join('')+(mine.length===2?'<span>I wrote this poem to show you I\'m right! 💪</span>':''):'<span style="color:var(--ink-soft)">I know I can do it. I can …</span>'}
+CAN.forEach(c=>{const b=document.createElement('button');b.className='chip';b.style.touchAction='manipulation';b.textContent=c;b.onclick=()=>{if(mine.includes(c)){mine=mine.filter(x=>x!==c);b.classList.remove('on')}else if(mine.length<2){mine.push(c);b.classList.add('on')}else{b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),450)}drawPoem()};$('#cando').appendChild(b)});
+$('#sayPoem').onclick=()=>{if(mine.length){speak($('#mypoem').textContent.replace('💪',''),.85);if(mine.length===2)addStar()}else speak('Choose two things you can do.')};
+$('#clearPoem').onclick=()=>{mine=[];$$('#cando .chip').forEach(x=>x.classList.remove('on'));drawPoem()};
+drawPoem();
+</script>
+</body>
+</html>
