@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Show Time! – Theater words & used to</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Nunito:wght@600;800;900&display=swap">
+<style>
+:root{
+  --bg:#FBF6EF; --surface:#FFFFFF; --surface-2:#F3EADF; --ink:#2A1A17; --ink-soft:#6B5650; --line:#E4D6C8;
+  --velvet:#8E1B2C; --velvet-ink:#FFF4E6; --gold:#C9971C; --gold-soft:#FFF1C9;
+  --good:#1F7A3A; --good-bg:#DDF2E3; --bad:#B3261E; --bad-bg:#FBE3E1; --blue:#1E63C6; --blue-bg:#E3EDFB;
+  --display:'Abril Fatface',Georgia,serif; --body:'Nunito','Segoe UI',Verdana,sans-serif; --r:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:600;font-size:clamp(18px,1.55vw,24px);line-height:1.4;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;overscroll-behavior:none;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;border:0;cursor:pointer;touch-action:manipulation}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.1}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--velvet);color:var(--velvet-ink);flex-wrap:wrap}
+.top h1{font-size:clamp(24px,2.4vw,36px);margin-right:auto;white-space:nowrap}
+.top h1 span{color:var(--gold)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{min-height:56px;padding:6px 18px;border-radius:999px;background:rgba(255,255,255,.12);color:var(--velvet-ink);font-weight:800;display:flex;align-items:center;gap:8px}
+.tab .n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.2);font-size:.85em}
+.tab[aria-selected=true]{background:var(--gold);color:#2A1A00}
+.tab[aria-selected=true] .n{background:#2A1A00;color:var(--gold)}
+.stars{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.25);padding:6px 16px;border-radius:999px;font-weight:900;font-size:1.15em;min-height:56px}
+.iconbtn{min-width:56px;min-height:56px;border-radius:50%;background:rgba(255,255,255,.12);color:var(--velvet-ink);font-size:24px;display:grid;place-items:center}
+
+main{flex:1;min-height:0;overflow:auto;padding:16px}
+section{display:none;max-width:1500px;margin:0 auto}
+section.on{display:block;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.instr{display:flex;align-items:center;gap:12px;margin:0 0 14px;flex-wrap:wrap}
+.instr h2{font-size:clamp(26px,2.6vw,40px);color:var(--velvet)}
+.instr p{margin:0;color:var(--ink-soft);font-size:1em}
+.pill{display:inline-flex;align-items:center;gap:8px;min-height:56px;padding:8px 20px;border-radius:999px;background:var(--surface);border:2px solid var(--line);font-weight:800}
+.pill.primary{background:var(--velvet);color:var(--velvet-ink);border-color:var(--velvet)}
+.pill.gold{background:var(--gold);border-color:var(--gold);color:#2A1A00}
+.pill:active,.chip:active,.opt:active,.tab:active{transform:scale(.96)}
+
+/* ---------- 1 MATCH ---------- */
+.match{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:16px;align-items:start}
+.photo{position:relative;border-radius:var(--r);overflow:hidden;box-shadow:0 10px 30px rgba(60,20,10,.18);background:#222;line-height:0}
+.photo img{width:100%;height:auto;display:block;pointer-events:none;-webkit-user-drag:none}
+.zone{position:absolute;transform:translate(-50%,-50%);width:9%;aspect-ratio:1.5;border-radius:16px;background:transparent;padding:0;border:0;display:grid;place-items:center;line-height:1}
+.zone::after{content:"";position:absolute;inset:14% 18%;border:4px dashed transparent;border-radius:12px;transition:.2s}
+.picking .zone:not(.done)::after{border-color:var(--gold);background:rgba(201,151,28,.22);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{transform:scale(1.12)}}
+.zone.hover::after{background:rgba(201,151,28,.55)!important}
+.zone .tag{display:none;position:relative;z-index:2;background:var(--velvet);color:#fff;font-weight:900;font-size:clamp(12px,1.15vw,19px);padding:5px 10px;border-radius:10px;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.4);border:2px solid var(--gold)}
+.zone.done .tag{display:block;animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+.zone.done{pointer-events:auto}
+@keyframes pop{from{transform:scale(.2)}to{transform:scale(1)}}
+.zone.wrong{animation:shake .45s}
+@keyframes shake{20%,60%{transform:translate(-58%,-50%)}40%,80%{transform:translate(-42%,-50%)}}
+.bank{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.bank h3{margin:0 0 2px;font-size:.9em;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bank .pill{justify-content:center}
+.chip{min-height:58px;padding:8px 10px;border-radius:14px;background:var(--gold-soft);border:3px solid var(--gold);font-weight:900;font-size:1.05em;text-align:left;display:flex;align-items:center;gap:10px;touch-action:none}
+.chip .l{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--gold);color:#2A1A00;font-size:.75em;flex:none}
+.chip.sel{background:var(--velvet);color:#fff;border-color:var(--velvet);box-shadow:0 0 0 5px rgba(142,27,44,.25)}
+.chip.sel .l{background:#fff;color:var(--velvet)}
+.chip.gone{opacity:.25;pointer-events:none;background:var(--surface-2);border-color:var(--line);text-decoration:line-through}
+.chip.shake{animation:shake2 .45s}
+@keyframes shake2{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.ghost{position:fixed;z-index:50;pointer-events:none;transform:translate(-50%,-50%) scale(1.08);opacity:.95;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.hint{font-size:.85em;color:var(--ink-soft);margin:0}
+.donebox{display:none;text-align:center;padding:10px 6px}
+.donebox.on{display:block}
+.donebox b{font-family:var(--display);font-weight:400;font-size:1.8em;color:var(--velvet);display:block}
+
+/* ---------- 2 QUIZ ---------- */
+.teams{display:flex;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.team{min-width:230px;padding:10px 22px;border-radius:var(--r);border:4px solid transparent;background:var(--surface);display:flex;align-items:center;justify-content:space-between;gap:16px;font-weight:900;font-size:1.15em;opacity:.55;transition:.25s}
+.team.turn{opacity:1;border-color:var(--c);box-shadow:0 6px 20px rgba(0,0,0,.12);transform:scale(1.04)}
+.team .sc{font-family:var(--display);font-size:1.8em;color:var(--c)}
+.qcard{max-width:1100px;margin:0 auto;background:var(--surface);border-radius:28px;padding:clamp(20px,3vw,40px);box-shadow:0 10px 30px rgba(60,20,10,.12);text-align:center;border-top:12px solid var(--velvet)}
+.qnum{color:var(--ink-soft);font-weight:800}
+.qdef{font-size:clamp(28px,3.2vw,50px);font-weight:900;margin:10px 0 26px;line-height:1.2}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.opt{min-height:110px;border-radius:22px;background:var(--surface-2);border:4px solid var(--line);font-weight:900;font-size:clamp(22px,2.3vw,34px);padding:10px}
+.opt.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.opt.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad);animation:shake2 .45s}
+.opt[disabled]{cursor:default}
+.dots{display:flex;gap:8px;justify-content:center;margin-top:22px}
+.dots i{width:16px;height:16px;border-radius:50%;background:var(--line)}
+.dots i.ok{background:var(--good)} .dots i.no{background:var(--bad)} .dots i.now{background:var(--gold);transform:scale(1.3)}
+.feedback{min-height:1.6em;margin-top:14px;font-weight:900;font-size:1.15em}
+
+/* ---------- 3 THINK ---------- */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:18px}
+.panel h3{margin:0 0 4px;font-size:1.15em}
+.panel .q{font-family:var(--display);font-weight:400;color:var(--velvet);font-size:1.35em;margin:0 0 12px}
+.cards{display:flex;flex-wrap:wrap;gap:10px;min-height:70px;margin-bottom:14px}
+.scard{min-height:58px;padding:8px 16px;border-radius:14px;background:var(--surface-2);border:3px solid var(--line);font-weight:800;display:flex;align-items:center;gap:8px;touch-action:none}
+.scard.sel{background:var(--velvet);color:#fff;border-color:var(--velvet)}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bin{border-radius:16px;border:4px dashed var(--line);padding:10px;min-height:200px;display:flex;flex-direction:column;gap:8px;transition:.2s}
+.bin h4{margin:0;font-size:1.1em;display:flex;align-items:center;gap:8px}
+.bin.on{border-color:var(--blue);background:var(--blue-bg)}
+.bin.back{background:#F1ECE6}
+.bin.back.on{background:var(--blue-bg)}
+.bin .scard{min-height:48px;font-size:.92em;background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.picking-bin .bin{border-color:var(--gold);background:var(--gold-soft)}
+.vote{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.vbtn{min-height:120px;border-radius:20px;background:var(--surface-2);border:4px solid var(--line);font-weight:900;font-size:1.3em;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.vbtn .e{font-size:1.8em;line-height:1}
+.vbtn.sel{border-color:var(--velvet);background:#FBE9EC;color:var(--velvet)}
+.reasons{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.reason{min-height:56px;padding:8px 16px;border-radius:14px;background:var(--surface-2);border:3px solid var(--line);font-weight:800}
+.reason.sel{background:var(--blue-bg);border-color:var(--blue);color:var(--blue)}
+.sentence{background:var(--paper,#FFFDF6);border:3px solid var(--gold);border-radius:16px;padding:14px 18px;font-size:1.25em;font-weight:900;min-height:80px;display:flex;align-items:center;gap:12px}
+.sentence .blank{display:inline-block;min-width:110px;border-bottom:3px solid var(--ink-soft)}
+.say{min-width:56px;min-height:56px;border-radius:50%;background:var(--gold);display:grid;place-items:center;font-size:24px;flex:none}
+
+/* ---------- 4 USED TO ---------- */
+.dialog{display:flex;flex-direction:column;gap:10px}
+.line{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;padding:10px 14px;border-radius:16px;background:var(--surface-2);border:3px solid transparent;font-weight:700}
+.line b{flex:none;min-width:74px;color:var(--c)}
+.line.playing{border-color:var(--gold);background:var(--gold-soft)}
+.line mark{background:#FFE08A;border-radius:6px;padding:0 4px;color:inherit;font-weight:900}
+.look{background:var(--blue-bg);border-left:10px solid var(--blue);border-radius:16px;padding:14px 18px;margin:14px 0}
+.look h3{margin:0 0 6px;color:var(--blue)}
+.formula{display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-weight:900;font-size:1.05em;margin:6px 0}
+.formula span{padding:6px 12px;border-radius:10px;background:#fff}
+.formula .pos{color:var(--good)} .formula .neg{color:var(--bad)}
+.mc{display:grid;gap:10px;margin-top:10px}
+.mc .opt{min-height:64px;font-size:1em;text-align:left;padding:10px 16px}
+.fill{display:flex;flex-direction:column;gap:12px}
+.frow{background:var(--surface-2);border-radius:16px;padding:12px 14px}
+.frow p{margin:0 0 8px;font-weight:800;font-size:1.08em}
+.frow .gap{display:inline-block;min-width:170px;border-bottom:3px solid var(--ink-soft);text-align:center;color:var(--velvet);font-weight:900;padding:0 6px}
+.frow .gap.ok{color:var(--good);border-color:var(--good)}
+.frow .btns{display:flex;gap:10px;flex-wrap:wrap}
+.frow .opt{min-height:56px;font-size:1em;padding:6px 16px;border-width:3px;border-radius:14px}
+.talk{display:grid;grid-template-columns:1fr;gap:14px;text-align:center}
+.tcard{background:var(--surface);border-radius:24px;padding:20px;border:4px solid var(--velvet);min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.tcard .era{font-family:var(--display);font-size:2em;color:var(--velvet)}
+.tcard .emo{font-size:3.4em;line-height:1}
+.tcard .topic{font-weight:900;font-size:1.3em}
+.tcard .kind{padding:4px 14px;border-radius:999px;font-weight:900}
+.kind.pos{background:var(--good-bg);color:var(--good)} .kind.neg{background:var(--bad-bg);color:var(--bad)}
+.tcard .model{font-weight:900;font-size:1.2em;color:var(--blue);min-height:1.5em}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* overlay */
+.overlay{position:fixed;inset:0;background:rgba(20,8,6,.55);display:none;place-items:center;z-index:80}
+.overlay.on{display:grid}
+.obox{background:var(--surface);border-radius:28px;padding:34px 44px;text-align:center;max-width:90vw;animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+.obox .big{font-family:var(--display);font-size:clamp(40px,6vw,80px);color:var(--velvet);line-height:1}
+.obox p{font-size:1.2em;margin:12px 0 20px}
+.confetti{position:fixed;top:-20px;width:12px;height:18px;z-index:90;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+@media (max-width:1000px){
+  .match{grid-template-columns:1fr}
+  .chips{grid-template-columns:repeat(3,1fr)}
+  .two{grid-template-columns:1fr}
+}
+@media (max-width:640px){ .opts{grid-template-columns:1fr} .chips{grid-template-columns:repeat(2,1fr)} }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>🎭 Show <span>Time!</span></h1>
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-go="s1"><span class="n">1</span>Match</button>
+    <button class="tab" role="tab" aria-selected="false" data-go="s2"><span class="n">2</span>Name it!</button>
+    <button class="tab" role="tab" aria-selected="false" data-go="s3"><span class="n">3</span>Think</button>
+    <button class="tab" role="tab" aria-selected="false" data-go="s4"><span class="n">4</span>Used to</button>
+  </nav>
+  <div class="stars" aria-live="polite">⭐ <span id="stars">0</span></div>
+  <button class="iconbtn" id="fs" title="Full screen" aria-label="Full screen">⛶</button>
+</header>
+
+<main>
+<!-- ============ 1 MATCH ============ -->
+<section id="s1" class="on">
+  <div class="instr">
+    <h2>Match the words to the photo</h2>
+    <p>Tap a word 👉 then tap the number. Or drag it! Tap a red label to listen and repeat. 🔊</p>
+  </div>
+  <div class="match">
+    <div class="photo" id="photo">
+      <img src="media/show-time.jpg" alt="A theater with an orchestra, an audience, a stage, a performer in a costume and actors backstage. Numbers 1 to 12 point to different things.">
+    </div>
+    <aside class="bank">
+      <h3>Words</h3>
+      <div class="chips" id="chips"></div>
+      <div class="donebox" id="matchDone"><b>Bravo! 👏</b>All 12 words matched.<br>Tap the labels and repeat.</div>
+      <button class="pill" id="listenAll">🔊 Listen to all</button>
+      <button class="pill" id="resetMatch">↺ Start again</button>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ 2 QUIZ ============ -->
+<section id="s2">
+  <div class="instr">
+    <h2>Name it! — Group quiz</h2>
+    <p>Work in groups. Read the clue and choose the word.</p>
+  </div>
+  <div class="teams">
+    <div class="team turn" id="teamA" style="--c:var(--velvet)">🔴 Team A <span class="sc" id="scA">0</span></div>
+    <div class="team" id="teamB" style="--c:var(--blue)">🔵 Team B <span class="sc" id="scB">0</span></div>
+  </div>
+  <div class="qcard">
+    <div class="qnum" id="qnum">Clue 1 of 8</div>
+    <div class="qdef" id="qdef"></div>
+    <div class="opts" id="opts"></div>
+    <div class="feedback" id="qfb"></div>
+    <div class="dots" id="dots"></div>
+    <div class="row" style="margin-top:16px">
+      <button class="pill" id="qread">🔊 Read the clue</button>
+      <button class="pill primary" id="qnext" style="display:none">Next ▶</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3 THINK ============ -->
+<section id="s3">
+  <div class="instr">
+    <h2>Think. Answer the questions.</h2>
+  </div>
+  <div class="two">
+    <div class="panel">
+      <h3>Question 1</h3>
+      <p class="q">What happens onstage? What happens backstage?</p>
+      <p class="hint">Tap a card, then tap the right box. (Or drag it.)</p>
+      <div class="cards" id="sortCards"></div>
+      <div class="bins">
+        <div class="bin" data-bin="on"><h4>🎤 Onstage</h4></div>
+        <div class="bin back" data-bin="back"><h4>🚪 Backstage</h4></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Question 2</h3>
+      <p class="q">Is it harder to rehearse or to perform? Why?</p>
+      <div class="vote">
+        <button class="vbtn" data-v="rehearse"><span class="e">📝</span>rehearse</button>
+        <button class="vbtn" data-v="perform"><span class="e">🎤</span>perform</button>
+      </div>
+      <p class="hint">Choose a reason:</p>
+      <div class="reasons" id="reasons"></div>
+      <div class="sentence"><button class="say" id="saySent" aria-label="Listen">🔊</button><span id="sent">I think it's harder to <span class="blank"></span> because <span class="blank"></span>.</span></div>
+      <p class="hint" style="margin-top:10px">🗣️ Read your sentence to your partner. Do you agree?</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4 USED TO ============ -->
+<section id="s4">
+  <div class="instr">
+    <h2>Used to — A theater in the past</h2>
+    <p>Tap each line to listen. 🔊</p>
+  </div>
+  <div class="two">
+    <div class="panel">
+      <h3>Listen and read</h3>
+      <div class="dialog" id="dialog"></div>
+      <p class="q" style="margin-top:14px;font-size:1.1em">What was different about the theater Elena visited?</p>
+      <div class="mc" id="mcDiff"></div>
+      <div class="look">
+        <h3>👀 Look!</h3>
+        <div>Use <b>used to</b> for things that happened often in the past.</div>
+        <div class="formula"><span class="pos">✔ used to + verb</span><span>People <b>used to stand</b> close to the stage.</span></div>
+        <div class="formula"><span class="neg">✘ didn't use to + verb</span><span>Theaters <b>didn't use to have</b> electric lights.</span></div>
+        <div class="hint">⚠️ Negative: <b>didn't use to</b> (no <b>d</b>!)</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Read and complete</h3>
+      <p class="hint">Tap <b>used to</b> or <b>didn't use to</b>.</p>
+      <div class="fill" id="fill"></div>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:18px">
+    <h3>🗣️ Talk Partners</h3>
+    <p class="hint">Take turns. Tell your partner how people lived in the past. Tap 💡 to see an example.</p>
+    <div class="talk">
+      <div class="tcard" id="tcard"></div>
+      <div class="row">
+        <button class="pill" id="tprev">◀</button>
+        <button class="pill gold" id="tshow">💡 Example</button>
+        <button class="pill primary" id="tnext">Next card ▶</button>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="overlay" id="ov"><div class="obox"><div class="big" id="ovBig"></div><p id="ovTxt"></p><button class="pill primary" id="ovClose">OK ✔</button></div></div>
+
+<script>
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+let stars=0; const addStar=(n=1)=>{stars+=n;$('#stars').textContent=stars};
+
+// Sound effects
+let ac; function tone(freqs,dur=.12,type='sine',vol=.15){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();let t=ac.currentTime;freqs.forEach(f=>{const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+dur);t+=dur*.9})}catch(e){}}
+const good=()=>tone([660,880,1100],.11,'triangle'), bad=()=>tone([220,180],.16,'square',.07);
+
+// Speech (English voice)
+let voice=null;
+function pickVoice(){const v=speechSynthesis.getVoices();voice=v.find(x=>/en-US/i.test(x.lang)&&/female|zira|jenny|aria|samantha|google us/i.test(x.name))||v.find(x=>/en-US/i.test(x.lang))||v.find(x=>/^en/i.test(x.lang))||null}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function speak(text,rate=.85,onend){if(!('speechSynthesis' in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='en-US';if(voice)u.voice=voice;u.rate=rate;if(onend)u.onend=onend;speechSynthesis.speak(u)}
+
+function confetti(){const cs=['#8E1B2C','#C9971C','#1E63C6','#1F7A3A','#FFB703'];for(let i=0;i<70;i++){const d=document.createElement('div');d.className='confetti';d.style.left=Math.random()*100+'vw';d.style.background=cs[i%5];d.style.animationDuration=(1.8+Math.random()*1.8)+'s';d.style.animationDelay=Math.random()*.5+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),4200)}tone([523,659,784,1046],.16,'triangle')}
+function overlay(big,txt){$('#ovBig').textContent=big;$('#ovTxt').textContent=txt;$('#ov').classList.add('on');confetti()}
+$('#ovClose').onclick=()=>$('#ov').classList.remove('on');
+
+/* tabs */
+$$('.tab').forEach(t=>t.onclick=()=>{$$('.tab').forEach(x=>x.setAttribute('aria-selected',x===t));$$('section').forEach(s=>s.classList.toggle('on',s.id===t.dataset.go));$('main').scrollTop=0;speechSynthesis&&speechSynthesis.cancel()});
+$('#fs').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{})};
+document.addEventListener('contextmenu',e=>e.preventDefault());
+
+/* ---------- generic tap-or-drag ---------- */
+// item: element to pick; getTarget(x,y) returns a drop element or null; onDrop(item,target)
+function tapOrDrag(item,{onPick,getTarget,onDrop,onHover}){
+  item.addEventListener('pointerdown',e=>{
+    if(item.disabled)return;
+    const sx=e.clientX,sy=e.clientY;let ghost=null,last=null;
+    item.setPointerCapture(e.pointerId);
+    const move=ev=>{
+      if(!ghost&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>12){ghost=item.cloneNode(true);ghost.classList.add('ghost');ghost.style.width=item.offsetWidth+'px';document.body.appendChild(ghost);onPick(item,true)}
+      if(ghost){ghost.style.left=ev.clientX+'px';ghost.style.top=ev.clientY+'px';const t=getTarget(ev.clientX,ev.clientY);if(t!==last){onHover&&onHover(last,false);onHover&&onHover(t,true);last=t}}
+    };
+    const up=ev=>{
+      item.removeEventListener('pointermove',move);item.removeEventListener('pointerup',up);item.removeEventListener('pointercancel',up);
+      if(ghost){ghost.remove();onHover&&onHover(last,false);const t=getTarget(ev.clientX,ev.clientY);if(t)onDrop(item,t)}
+      else onPick(item,false);
+    };
+    item.addEventListener('pointermove',move);item.addEventListener('pointerup',up);item.addEventListener('pointercancel',up);
+  });
+}
+function targetAt(x,y,sel){const els=document.elementsFromPoint(x,y);for(const el of els){const t=el.closest&&el.closest(sel);if(t)return t}return null}
+
+/* =========== 1 MATCH =========== */
+// x,y = % position of each white answer box on the photo
+const SPOTS=[
+ {n:1,x:10.6,y:86.2,w:'conductor'},{n:2,x:14.1,y:65.0,w:'orchestra'},{n:3,x:26.7,y:53.6,w:'musician'},
+ {n:4,x:19.9,y:45.2,w:'audience'},{n:5,x:29.3,y:40.6,w:'dance company'},{n:6,x:52.3,y:27.5,w:'perform'},
+ {n:7,x:41.4,y:67.7,w:'set'},{n:8,x:43.7,y:94.7,w:'stage'},{n:9,x:59.0,y:76.3,w:'costume'},
+ {n:10,x:88.5,y:88.4,w:'backstage'},{n:11,x:80.9,y:24.5,w:'makeup'},{n:12,x:91.9,y:25.5,w:'rehearse'}];
+const WORDS=[['a','musician'],['b','audience'],['c','stage'],['d','backstage'],['e','set'],['f','costume'],['g','makeup'],['h','orchestra'],['i','perform'],['j','rehearse'],['k','conductor'],['l','dance company']];
+let selChip=null,matched=0;
+function buildMatch(){
+  const ph=$('#photo');ph.querySelectorAll('.zone').forEach(z=>z.remove());
+  SPOTS.forEach(s=>{const z=document.createElement('button');z.className='zone';z.style.left=s.x+'%';z.style.top=s.y+'%';z.dataset.w=s.w;z.setAttribute('aria-label','Number '+s.n);z.innerHTML='<span class="tag">'+s.n+' '+s.w+'</span>';
+    z.onclick=()=>{if(z.classList.contains('done')){speak(s.w);return}if(selChip)tryMatch(selChip,z);else{z.classList.add('wrong');setTimeout(()=>z.classList.remove('wrong'),450);hintFlash()}};ph.appendChild(z)});
+  const box=$('#chips');box.innerHTML='';
+  WORDS.forEach(([l,w])=>{const c=document.createElement('button');c.className='chip';c.dataset.w=w;c.innerHTML='<span class="l">'+l+'</span>'+w;box.appendChild(c);
+    tapOrDrag(c,{onPick:(it,drag)=>{if(!drag&&selChip===it){unsel();return}select(it)},getTarget:(x,y)=>{const t=targetAt(x,y,'.zone');return t&&!t.classList.contains('done')?t:null},onDrop:tryMatch,onHover:(t,on)=>t&&t.classList.toggle('hover',on)})});
+  matched=0;selChip=null;$('#matchDone').classList.remove('on');ph.classList.remove('picking');
+}
+function select(c){unsel();selChip=c;c.classList.add('sel');$('#photo').classList.add('picking');speak(c.dataset.w)}
+function unsel(){if(selChip)selChip.classList.remove('sel');selChip=null;$('#photo').classList.remove('picking')}
+function hintFlash(){$$('.chip:not(.gone)').forEach(c=>{c.classList.add('shake');setTimeout(()=>c.classList.remove('shake'),450)})}
+function tryMatch(c,z){
+  if(c.dataset.w===z.dataset.w){z.classList.add('done');c.classList.add('gone');unsel();good();setTimeout(()=>speak(z.dataset.w),250);addStar();matched++;
+    if(matched===12){$('#matchDone').classList.add('on');setTimeout(()=>overlay('Bravo! 🎭','You matched all 12 theater words!'),700)}}
+  else{bad();z.classList.add('wrong');c.classList.add('shake');setTimeout(()=>{z.classList.remove('wrong');c.classList.remove('shake')},450)}
+}
+$('#resetMatch').onclick=buildMatch;
+$('#listenAll').onclick=()=>{let i=0;const next=()=>{if(i>=WORDS.length)return;const w=WORDS[i++][1];speak(w,.8,()=>setTimeout(next,700))};next()};
+buildMatch();
+
+/* =========== 2 QUIZ =========== */
+const QUIZ=[
+ ['a large group of musicians playing together','orchestra',['orchestra','audience','dance company']],
+ ['the person who directs an orchestra','conductor',['musician','conductor','audience']],
+ ['the place where actors perform','stage',['backstage','set','stage']],
+ ["the part of a theater the audience doesn't see",'backstage',['backstage','stage','costume']],
+ ['the decoration of the stage','set',['makeup','set','costume']],
+ ['what performers wear on their faces on stage','makeup',['costume','set','makeup']],
+ ['to practice for a performance','rehearse',['perform','rehearse','conductor']],
+ ['a group of dancers who perform together','dance company',['orchestra','dance company','audience']]];
+let qi=0,turn='A',score={A:0,B:0},results=[];
+function renderQ(){
+  const [def,ans,opts]=QUIZ[qi];$('#qnum').textContent='Clue '+(qi+1)+' of 8';$('#qdef').textContent='“'+def+'”';$('#qfb').textContent='';$('#qnext').style.display='none';
+  $('#teamA').classList.toggle('turn',turn==='A');$('#teamB').classList.toggle('turn',turn==='B');
+  const o=$('#opts');o.innerHTML='';shuffle(opts).forEach(w=>{const b=document.createElement('button');b.className='opt';b.textContent=w;b.onclick=()=>answerQ(b,w,ans);o.appendChild(b)});
+  $('#dots').innerHTML=QUIZ.map((_,i)=>'<i class="'+(results[i]||(i===qi?'now':''))+'"></i>').join('');
+}
+function answerQ(b,w,ans){
+  const btns=$$('#opts .opt');
+  if(w===ans){btns.forEach(x=>x.disabled=true);b.classList.add('ok');good();speak(ans);
+    const first=!results[qi];if(first){score[turn]++;results[qi]='ok';addStar()}
+    $('#sc'+turn).textContent=score[turn];$('#qfb').style.color='var(--good)';$('#qfb').textContent='✔ Correct! +1 for Team '+turn;
+    $('#qnext').style.display='';$('#qnext').textContent=qi===7?'See results 🏆':'Next ▶';
+  }else{b.classList.add('no');b.disabled=true;bad();results[qi]='no';const other=turn==='A'?'B':'A';
+    $('#qfb').style.color='var(--bad)';$('#qfb').textContent='✘ Not quite! Team '+other+', your turn!';turn=other;
+    $('#teamA').classList.toggle('turn',turn==='A');$('#teamB').classList.toggle('turn',turn==='B')}
+  $('#dots').innerHTML=QUIZ.map((_,i)=>'<i class="'+(results[i]||(i===qi?'now':''))+'"></i>').join('');
+}
+$('#qnext').onclick=()=>{if(qi===7){const w=score.A===score.B?"It's a tie! 🤝":(score.A>score.B?'Team A wins! 🔴':'Team B wins! 🔵');overlay(w,'Team A: '+score.A+'  ·  Team B: '+score.B);qi=0;results=[];score={A:0,B:0};$('#scA').textContent=0;$('#scB').textContent=0;turn='A';renderQ();return}
+  qi++;turn=turn==='A'?'B':'A';renderQ()};
+$('#qread').onclick=()=>speak(QUIZ[qi][0],.8);
+renderQ();
+
+/* =========== 3 THINK =========== */
+const SORT=[['Actors perform 🎭','on'],['Dancers dance 💃','on'],['Singers sing 🎤','on'],['The audience sees the set 👀','on'],
+ ['People put on makeup 💄','back'],['Actors change costumes 👗','back'],['Actors wait for their turn ⏳','back'],['Actors read their lines 📄','back']];
+let selCard=null,sorted=0;
+function buildSort(){
+  const box=$('#sortCards');box.innerHTML='';$$('.bin .scard').forEach(x=>x.remove());sorted=0;
+  shuffle(SORT).forEach(([t,b])=>{const c=document.createElement('button');c.className='scard';c.textContent=t;c.dataset.b=b;box.appendChild(c);
+    tapOrDrag(c,{onPick:(it,drag)=>{if(!drag&&selCard===it){unselCard();return}unselCard();selCard=it;it.classList.add('sel');$('#s3 .bins').classList.add('picking-bin');speak(it.textContent.replace(/[^\w\s']/g,''))},
+      getTarget:(x,y)=>targetAt(x,y,'.bin'),onDrop:dropCard,onHover:(t,on)=>t&&t.classList.toggle('on',on)})});
+}
+function unselCard(){if(selCard)selCard.classList.remove('sel');selCard=null;$('#s3 .bins').classList.remove('picking-bin')}
+function dropCard(c,bin){
+  if(c.dataset.b===bin.dataset.bin){c.classList.remove('sel');c.style.touchAction='auto';bin.appendChild(c);c.disabled=true;unselCard();good();addStar();sorted++;
+    if(sorted===SORT.length)setTimeout(()=>overlay('Great! 🌟','Onstage = in front of the audience. Backstage = behind the curtain.'),500)}
+  else{bad();c.classList.add('shake');setTimeout(()=>c.classList.remove('shake'),450);bin.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'none'}],{duration:350})}
+}
+$$('.bin').forEach(b=>b.onclick=()=>{if(selCard)dropCard(selCard,b)});
+buildSort();
+
+const REASONS=['you feel nervous','you practice many times','everybody watches you','you need to remember a lot','you can\'t make mistakes','it takes a long time'];
+let vote=null,reason=null;
+function updSent(){$('#sent').innerHTML="I think it's harder to "+(vote?'<b style="color:var(--velvet)">'+vote+'</b>':'<span class="blank"></span>')+' because '+(reason?'<b style="color:var(--blue)">'+reason+'</b>':'<span class="blank"></span>')+'.'}
+$$('.vbtn').forEach(b=>b.onclick=()=>{$$('.vbtn').forEach(x=>x.classList.toggle('sel',x===b));vote=b.dataset.v;speak(vote);updSent()});
+REASONS.forEach(r=>{const b=document.createElement('button');b.className='reason';b.textContent='because '+r;b.onclick=()=>{$$('.reason').forEach(x=>x.classList.toggle('sel',x===b));reason=r;updSent()};$('#reasons').appendChild(b)});
+$('#saySent').onclick=()=>{if(vote&&reason){speak("I think it's harder to "+vote+" because "+reason+".");addStar()}else speak("Choose rehearse or perform, and a reason.")};
+
+/* =========== 4 USED TO =========== */
+const DIALOG=[
+ ['Elena','Hi, Bruno! My class went to see a play yesterday. The theater was really interesting — it was just like the 19th century.'],
+ ['Bruno','That sounds cool. How was it different from modern theaters?'],
+ ['Elena',"Well, there were a lot of candles because theaters <mark>didn't use to have</mark> electric lights."],
+ ['Bruno','Oh, that sounds dangerous!'],
+ ['Elena','And we could shout at the actors and talk while they performed, because the audience <mark>used to be</mark> very loud.'],
+ ['Bruno',"Really? I don't think I'd like that!"],
+ ['Elena',"It was fun, but very noisy. I think that's why people <mark>used to stand</mark> so close to the stage!"]];
+const dl=$('#dialog');
+DIALOG.forEach(([who,txt])=>{const b=document.createElement('button');b.className='line';b.style.setProperty('--c',who==='Elena'?'var(--velvet)':'var(--blue)');b.innerHTML='<b>'+(who==='Elena'?'👧 ':'👦 ')+who+'</b><span>'+txt+'</span>';
+  b.onclick=()=>{$$('.line').forEach(x=>x.classList.remove('playing'));b.classList.add('playing');speak(b.textContent.replace(/^\S+\s\w+/,''),.85,()=>b.classList.remove('playing'))};dl.appendChild(b)});
+
+const DIFF=[['It had candles, not electric lights. 🕯️',true],['It had a big cinema screen. 🎬',false],['The audience was very quiet. 🤫',false]];
+shuffle(DIFF).forEach(([t,ok])=>{const b=document.createElement('button');b.className='opt';b.textContent=t;b.onclick=()=>{if(ok){b.classList.add('ok');good();addStar();$$('#mcDiff .opt').forEach(x=>x.disabled=true)}else{b.classList.add('no');b.disabled=true;bad()}};$('#mcDiff').appendChild(b)});
+
+const FILL=[
+ ['In the 19th century, people','ride','horses to get around town.',true],
+ ['People','go','to the theater a lot in the past.',true],
+ ['In the 19th century, children','watch','television.',false],
+ ['My grandma','make','all her own clothes.',true],
+ ['I','like',"coffee, but now I do.",false],
+ ['We','visit','my cousins when we went on vacation, but now we go to the beach.',true]];
+FILL.forEach(([a,v,b,pos],i)=>{const r=document.createElement('div');r.className='frow';
+  r.innerHTML='<p>'+(i+1)+'. '+a+' <span class="gap">('+v+')</span> '+b+'</p><div class="btns"></div>';
+  const gap=r.querySelector('.gap');
+  [['used to '+v,true],["didn't use to "+v,false]].forEach(([t,isPos])=>{const btn=document.createElement('button');btn.className='opt';btn.textContent=t;
+    btn.onclick=()=>{if(isPos===pos){gap.textContent=t;gap.classList.add('ok');btn.classList.add('ok');r.querySelectorAll('.opt').forEach(x=>x.disabled=true);good();addStar();speak(a+' '+t+' '+b)}else{btn.classList.add('no');btn.disabled=true;bad()}};
+    r.querySelector('.btns').appendChild(btn)});
+  $('#fill').appendChild(r)});
+
+const TALK=[
+ ['1950s','📺','TVs','pos','In the 1950s, people used to have black-and-white TVs.'],
+ ['1990s','📱','cell phones','neg',"In the 1990s, people didn't use to text on their cell phones."],
+ ['1800s','🐴','transportation','pos','In the 1800s, people used to ride horses.'],
+ ['1800s','🕯️','lights','neg',"In the 1800s, people didn't use to have electric lights."],
+ ['1970s','🎵','music','pos','In the 1970s, people used to listen to records.'],
+ ['1960s','💻','computers','neg',"In the 1960s, people didn't use to have computers at home."],
+ ['1980s','✉️','messages','pos','In the 1980s, people used to write letters.'],
+ ['1900s','🎭','theater','pos','In the 1900s, people used to go to the theater a lot.'],
+ ['1990s','🌐','the internet','neg',"In the 1990s, children didn't use to play games online."],
+ ['1950s','📷','photos','neg',"In the 1950s, people didn't use to take color photos."]];
+let ti=0;
+function renderT(){const [era,emo,topic,kind]=TALK[ti];
+  $('#tcard').innerHTML='<div class="era">'+era+'</div><div class="emo">'+emo+'</div><div class="topic">'+topic+'</div><div class="kind '+kind+'">'+(kind==='pos'?'✔ used to':"✘ didn't use to")+'</div><div class="model" id="model"></div>'}
+$('#tnext').onclick=()=>{ti=(ti+1)%TALK.length;renderT()};
+$('#tprev').onclick=()=>{ti=(ti-1+TALK.length)%TALK.length;renderT()};
+$('#tshow').onclick=()=>{$('#model').textContent=TALK[ti][4];speak(TALK[ti][4])};
+renderT();
+</script>
+</body>
+</html>
