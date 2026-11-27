@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Case of the Missing Trophy</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@700;800;900&display=swap">
+<style>
+/* Layout: one big idea per screen — friendly top bar with step icons, large picture cards in the middle, two huge buttons at the bottom, script drawer hidden at the side. */
+[hidden]{display:none!important}
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --sky:#E8F3FF; --card:#FFFFFF; --soft:#F1F5FB; --ink:#1B2440; --ink-soft:#56607A; --line:#D3DCEB;
+  --navy:#22306B; --sun:#FFC93C; --sun-soft:#FFF3CC; --coral:#F2545B; --teal:#12A39A; --blue:#2F6BFF; --blue-soft:#E3ECFF;
+  --mia:#E53935; --leo:#1E6FE8; --sam:#1E2230; --gold:#F2A900;
+  --ok:#0F8A4C; --okbg:#DDF7E8; --no:#C62828; --nobg:#FDE3E1;
+  --display:'Baloo 2','Trebuchet MS',sans-serif; --body:'Nunito','Segoe UI',Verdana,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--body);font-weight:800;font-size:clamp(18px,1.6vw,28px);line-height:1.3;display:flex;flex-direction:column;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
+h1,h2,h3{font-family:var(--display);font-weight:800;margin:0;line-height:1.02;text-wrap:balance}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* top bar */
+.top{background:var(--navy);color:#fff}
+.top .wrap{display:flex;align-items:center;gap:12px;padding-block:8px;flex-wrap:wrap}
+.brand{font-family:var(--display);font-size:1em;white-space:nowrap}
+.brand span{color:var(--sun)}
+.steps{display:flex;gap:6px;flex:1;justify-content:center;margin:0;padding:0;list-style:none;flex-wrap:wrap}
+.steps li{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:1.1em;background:rgba(255,255,255,.1);opacity:.5}
+.steps li.done{opacity:.9}
+.steps li.now{background:var(--sun);opacity:1;transform:scale(1.12)}
+.tbtn{min-height:46px;padding:4px 14px;border-radius:999px;background:rgba(255,255,255,.14);color:#fff;font-size:.72em;white-space:nowrap}
+.tbtn[aria-pressed=true]{background:var(--sun);color:var(--navy)}
+
+/* stage */
+#stage{flex:1;min-height:0;overflow:auto}
+#view{padding-block:clamp(10px,2vh,24px);max-width:1400px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;gap:clamp(10px,2vh,22px)}
+.anim{animation:in .35s ease both}
+@keyframes in{from{opacity:.2;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pop{from{transform:scale(.6);opacity:.3}to{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.title{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.title h2{font-size:clamp(32px,3.6vw,60px)}
+.title .em{font-size:clamp(34px,3.6vw,60px);line-height:1}
+.hint{display:inline-flex;align-items:center;gap:8px;background:var(--card);border-radius:999px;padding:6px 16px;color:var(--ink-soft);font-size:.82em}
+
+/* welcome */
+.welcome{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:clamp(16px,3vw,48px);align-items:center}
+.welcome h1{font-size:clamp(44px,6.4vw,110px);color:var(--navy)}
+.welcome h1 span{color:var(--coral)}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin:clamp(12px,2.4vh,28px) 0}
+.chip{background:var(--card);border-radius:999px;padding:10px 20px;font-size:1em}
+.go{display:inline-flex;align-items:center;gap:12px;min-height:84px;padding:12px 36px;border-radius:999px;background:var(--coral);color:#fff;font-family:var(--display);font-size:1.3em;box-shadow:0 8px 0 #B7323A}
+.go:active{transform:translateY(5px);box-shadow:0 3px 0 #B7323A}
+.go[disabled]{background:#B9C3D6;box-shadow:0 8px 0 #98A3B8;cursor:default}
+.go.teal{background:var(--teal);box-shadow:0 8px 0 #0B746E}
+.hero{position:relative;background:var(--card);border-radius:40px;aspect-ratio:1;max-width:100%;display:grid;place-items:center;box-shadow:0 16px 40px rgba(34,48,107,.15)}
+.hero svg{width:60%}
+.hero .q{position:absolute;right:10%;top:8%;width:28%;aspect-ratio:1;border-radius:50%;background:var(--coral);color:#fff;font-family:var(--display);font-size:clamp(40px,5vw,90px);display:grid;place-items:center;transform:rotate(10deg)}
+
+/* picture cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:clamp(10px,1.2vw,16px)}
+.pc{position:relative;border-radius:24px;background:var(--card);min-height:clamp(110px,16vh,165px);padding:10px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;box-shadow:0 4px 0 var(--line)}
+.pc .e{font-size:2.1em;line-height:1}
+.pc .w{font-family:var(--display);font-size:1.12em;line-height:1.05}
+.pc .d{display:none;font-size:.86em;line-height:1.25}
+.pc .x{display:none;font-size:.74em;color:#D5DEFF;font-weight:700}
+.pc.open{background:var(--navy);color:#fff;box-shadow:0 4px 0 #11184A;animation:pop .25s ease}
+.pc.open .e{font-size:1.4em}
+.pc.open .w{color:var(--sun);font-size:.95em}
+.pc.open .d,.pc.open .x{display:block}
+.pc .star{position:absolute;top:6px;right:8px;font-size:.8em}
+.legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.vs-btn{min-height:64px;padding:8px 26px;border-radius:999px;background:var(--sun);font-family:var(--display);font-size:1.1em;box-shadow:0 5px 0 #D29E14}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:stretch}
+.vs .side{background:var(--card);border-radius:28px;padding:16px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;border:5px solid var(--c)}
+.vs .side h3{font-size:1.6em;color:var(--c)}
+.vs .side .big{font-size:2.4em;line-height:1}
+.vs .side .say{background:var(--soft);border-radius:18px;padding:6px 14px;font-style:italic}
+.vs .mid{display:grid;place-items:center;font-family:var(--display);font-size:1.6em;color:var(--ink-soft)}
+
+/* suspects */
+.sus-row{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.6vw,24px)}
+.sus{position:relative;background:var(--card);border-radius:30px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:4px;border:5px solid transparent;transition:.25s}
+.sus .pic{display:flex;align-items:flex-end;gap:4px;height:clamp(110px,22vh,210px)}
+.sus .pic svg{height:100%;width:auto}
+.sus .pic .bag{height:62%}
+.sus .pic img{height:100%;width:auto;border-radius:20px;object-fit:cover}
+.sus .nm{font-family:var(--display);font-size:1.6em;line-height:1}
+.sus .it{font-size:.8em;color:var(--ink-soft);text-align:center}
+.sus.star{border-color:var(--sun);box-shadow:0 0 0 8px rgba(255,201,60,.35)}
+.sus.safe{opacity:.55}
+.badge{position:absolute;top:10px;right:10px;border-radius:999px;padding:4px 12px;font-size:.72em;color:#fff;animation:pop .3s ease}
+.badge.ok{background:var(--ok)} .badge.look{background:var(--coral)}
+.clue-zone{display:grid;grid-template-columns:auto 1fr;gap:clamp(12px,2vw,26px);align-items:center}
+.clue-big{background:var(--card);border-radius:28px;padding:14px 22px;display:flex;align-items:center;gap:18px;min-height:110px;border:5px solid var(--sun);animation:pop .3s ease}
+.clue-big .ic{display:flex;gap:6px;align-items:center;flex:none}
+.clue-big .ic svg{height:clamp(54px,9vh,88px);width:auto}
+.clue-big .n{font-family:var(--display);color:var(--coral);font-size:.9em;line-height:1}
+.clue-big .t{font-size:1.08em}
+.clue-big.lock{border-color:var(--line);background:repeating-linear-gradient(-45deg,#EEF2F8 0 16px,#fff 16px 32px)}
+.dots{display:flex;gap:8px;justify-content:center;margin-top:6px}
+.dots i{width:16px;height:16px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--sun)}
+
+/* quiz */
+.qtop{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.qn{background:var(--navy);color:var(--sun);font-family:var(--display);padding:4px 18px;border-radius:999px}
+.howto{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.85em;color:var(--ink-soft)}
+.howto b{background:var(--card);border-radius:999px;padding:4px 14px;color:var(--ink)}
+.qtext{font-size:clamp(34px,4.2vw,70px);color:var(--navy)}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.6vw,24px);flex:1;max-height:420px}
+.opt{border-radius:30px;background:var(--card);border:6px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;text-align:center;box-shadow:0 6px 0 var(--line);min-height:180px}
+.opt .pic{height:clamp(56px,11vh,110px);display:flex;align-items:center;justify-content:center;font-size:clamp(48px,6vh,84px);line-height:1}
+.opt .pic svg{height:100%;width:auto}
+.opt .tx{font-size:1.08em}
+.opt .row{display:flex;align-items:center;gap:12px}
+.opt .L{font-family:var(--display);font-size:1.5em;width:1.7em;height:1.7em;border-radius:50%;background:var(--soft);display:grid;place-items:center}
+.fingers{display:flex;gap:4px;align-items:flex-end;height:30px}
+.fingers i{width:10px;height:30px;border-radius:6px;background:var(--ink-soft)}
+.opt.sel{border-color:var(--blue);background:var(--blue-soft);box-shadow:0 6px 0 #9DB6FF}
+.opt.sel .L{background:var(--blue);color:#fff}
+.opt.sel .fingers i{background:var(--blue)}
+.saved{font-size:.95em;color:var(--ink-soft);min-height:1.4em;text-align:center}
+.saved b{color:var(--blue)}
+.mic{background:var(--sun-soft);border:5px dashed var(--sun);border-radius:28px;padding:12px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;animation:pop .3s ease}
+.mic .m{font-size:2.2em}
+.mic .f{font-family:var(--display);font-size:1.4em}
+.mic .f span{display:inline-block;min-width:3em;border-bottom:5px solid var(--ink);margin:0 4px}
+.mic small{display:block;font-size:.72em;color:var(--ink-soft)}
+
+/* reveal & score */
+.reveal{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(14px,2.4vw,34px);align-items:center;flex:1}
+.cam{background:#121722;border-radius:26px;padding:10px;color:#8CF2B0;font-family:Consolas,'Courier New',monospace;font-size:.7em;position:relative;overflow:hidden}
+.cam .bar{display:flex;justify-content:space-between;padding:2px 8px 8px}
+.cam .rec{color:#FF5A4F}
+.cam svg{width:100%;display:block;border-radius:16px;transition:filter .8s ease}
+.cam.blur svg{filter:blur(18px) brightness(.7)}
+.cam .playbtn{position:absolute;inset:0;margin:auto;width:max-content;height:max-content;padding:14px 30px;border-radius:999px;background:var(--sun);color:var(--navy);font-family:var(--display);font-size:1.6em;box-shadow:0 6px 0 #D29E14}
+.who{display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+.who h2{font-size:clamp(44px,5.6vw,96px);color:var(--coral)}
+.bubble{position:relative;background:var(--card);border-radius:28px;padding:16px 22px;font-size:1.1em;box-shadow:0 6px 0 var(--line)}
+.why{display:flex;gap:10px;flex-wrap:wrap}
+.why span{background:var(--card);border-radius:999px;padding:6px 14px;font-size:.78em}
+.scorebox{display:grid;grid-template-columns:auto 1fr;gap:clamp(16px,3vw,40px);align-items:center;flex:1}
+.stars{font-size:clamp(34px,4.4vw,70px);letter-spacing:.06em;line-height:1}
+.bignum{font-family:var(--display);font-size:clamp(90px,13vw,220px);color:var(--teal);line-height:.9;text-align:center;font-variant-numeric:tabular-nums}
+.ans{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.ans li{background:var(--card);border-radius:20px;padding:10px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;font-size:.86em}
+.ans .k{font-family:var(--display);color:var(--ink-soft)}
+.ans .r{padding:2px 12px;border-radius:999px;white-space:nowrap}
+.ans .r.ok{background:var(--okbg);color:var(--ok)} .ans .r.no{background:var(--nobg);color:var(--no)}
+
+/* nav */
+.nav{background:var(--card)}
+.nav .wrap{display:flex;gap:12px;align-items:center;justify-content:space-between;padding-block:10px}
+.nb{min-height:66px;min-width:170px;padding:8px 26px;border-radius:999px;font-family:var(--display);font-size:1.05em;background:var(--soft);color:var(--ink)}
+.nb.next{background:var(--navy);color:#fff}
+.nb.hot{background:var(--coral)}
+.nb[disabled]{opacity:.3;cursor:default}
+.nav .where{color:var(--ink-soft);font-size:.8em;text-align:center}
+
+/* script */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100vw);background:#FFFDF4;box-shadow:-10px 0 40px rgba(0,0,0,.3);z-index:40;display:flex;flex-direction:column;font-size:clamp(15px,1.1vw,19px);font-weight:700;user-select:text;-webkit-user-select:text}
+.drawer header{display:flex;align-items:center;gap:10px;padding:12px max(16px,env(safe-area-inset-right,0px)) 12px 16px;padding-top:calc(12px + env(safe-area-inset-top,0px));background:var(--navy);color:#fff}
+.drawer header h3{font-size:1.15em;flex:1}
+.drawer .body{overflow:auto;padding:14px max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) 16px;display:flex;flex-direction:column;gap:8px}
+.time{color:var(--coral)}
+.coord{background:#EEF2FF;border-left:5px solid var(--blue);border-radius:8px;padding:8px 12px;font-weight:600}
+.coord::before{content:"🎬 Coordinación: ";font-weight:900;color:var(--blue)}
+.ln{display:grid;grid-template-columns:118px 1fr;gap:10px;align-items:start}
+.role{font-size:.78em;padding:3px 8px;border-radius:8px;text-align:center;background:var(--soft)}
+.r-P{background:#FDE7E9;color:#8A1020} .r-D{background:#E0E9FF;color:#183C9E} .r-H{background:#FFF1C2;color:#6B4D00}
+.r-W{background:#E4F6EA;color:#05603A} .r-S{background:#ECECEC;color:#14181F}
+.en{font-weight:900}
+
+@media (max-width:860px){
+  .welcome,.reveal,.scorebox,.clue-zone{grid-template-columns:1fr}
+  .opts,.sus-row{grid-template-columns:1fr}
+  .vs{grid-template-columns:1fr}
+  .steps li{width:36px;height:36px}
+  .nb{min-width:0}
+}
+</style>
+
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <span class="brand">🔍 Missing <span>Trophy</span></span>
+    <ol class="steps" id="steps" aria-label="Steps"></ol>
+    <button class="tbtn" id="scriptBtn" aria-pressed="false" aria-controls="drawer">📜 Guion</button>
+    <button class="tbtn" id="fsBtn" title="Pantalla completa" aria-label="Pantalla completa">⛶</button>
+  </div>
+</header>
+
+<main id="stage" aria-live="polite"><div class="wrap" id="view"></div></main>
+
+<nav class="nav">
+  <div class="wrap">
+    <button class="nb" id="backBtn">◀ Back</button>
+    <span class="where" id="where"></span>
+    <button class="nb next" id="nextBtn">Next ▶</button>
+  </div>
+</nav>
+
+<aside class="drawer" id="drawer" hidden aria-label="Guion para alumnos">
+  <header><h3 id="drawerTitle">Guion</h3><button class="tbtn" id="closeDrawer">✕ Cerrar</button></header>
+  <div class="body" id="drawerBody"></div>
+</aside>
+
+<script>
+/* ===== pictures (replace with real photos later: set photo:'file.jpg' in SUS) ===== */
+const STAR='<polygon points="50,44 54.7,54.2 65.8,55.1 57.4,62.4 60,73.3 50,67.6 40,73.3 42.6,62.4 34.2,55.1 45.3,54.2" fill="#fff"/>';
+const backpack=(c,star)=>`<svg class="bag" viewBox="0 0 100 100" role="img" aria-label="${star?'black backpack with a white star':'blue backpack'}"><path d="M38 20 Q50 6 62 20" fill="none" stroke="${c}" stroke-width="7" stroke-linecap="round"/><rect x="20" y="18" width="60" height="76" rx="18" fill="${c}"/><rect x="29" y="50" width="42" height="36" rx="10" fill="rgba(255,255,255,.16)"/><rect x="29" y="34" width="42" height="6" rx="3" fill="rgba(255,255,255,.3)"/>${star?STAR:''}</svg>`;
+const tote=c=>`<svg class="bag" viewBox="0 0 100 100" role="img" aria-label="red bag"><path d="M33 40 Q33 12 50 12 Q67 12 67 40" fill="none" stroke="${c}" stroke-width="7" stroke-linecap="round"/><path d="M16 38 H84 L77 94 H23 Z" fill="${c}"/><rect x="16" y="38" width="68" height="10" fill="rgba(0,0,0,.15)"/></svg>`;
+const trophy=(f='#F2A900')=>`<svg viewBox="0 0 100 100" role="img" aria-label="trophy"><path d="M30 14 H70 V40 Q70 62 50 64 Q30 62 30 40 Z" fill="${f}"/><path d="M30 20 H16 Q16 44 32 46" fill="none" stroke="${f}" stroke-width="6"/><path d="M70 20 H84 Q84 44 68 46" fill="none" stroke="${f}" stroke-width="6"/><rect x="45" y="63" width="10" height="14" fill="${f}"/><rect x="32" y="77" width="36" height="9" rx="2" fill="${f}"/><rect x="26" y="86" width="48" height="8" rx="2" fill="#6B4400"/><circle cx="50" cy="36" r="11" fill="rgba(255,255,255,.35)"/></svg>`;
+function kid(shirt,hair,{long=false}={}){return `<svg viewBox="0 0 100 130" role="img" aria-label="student"><path d="M16 130 Q16 76 50 72 Q84 76 84 130 Z" fill="${shirt}"/>${long?`<path d="M24 40 Q22 78 34 80 H66 Q78 78 76 40 Z" fill="${hair}"/>`:''}<circle cx="50" cy="42" r="25" fill="#F1C19B"/><path d="M25 38 Q28 14 50 15 Q73 15 75 38 Q64 26 50 28 Q36 26 25 38Z" fill="${hair}"/><circle cx="41" cy="45" r="3.4" fill="#1B2440"/><circle cx="59" cy="45" r="3.4" fill="#1B2440"/><path d="M42 55 Q50 62 58 55" fill="none" stroke="#1B2440" stroke-width="3" stroke-linecap="round"/><circle cx="35" cy="53" r="4" fill="#F7A3A0" opacity=".6"/><circle cx="65" cy="53" r="4" fill="#F7A3A0" opacity=".6"/></svg>`}
+const ICON={eye:'<svg viewBox="0 0 100 60" role="img" aria-label="witness"><path d="M4 30 Q50 -10 96 30 Q50 70 4 30Z" fill="#22306B"/><circle cx="50" cy="30" r="15" fill="#fff"/><circle cx="50" cy="30" r="8" fill="#2F6BFF"/></svg>',
+ cam:'<svg viewBox="0 0 100 80" role="img" aria-label="photo"><rect x="6" y="16" width="88" height="58" rx="12" fill="#22306B"/><rect x="34" y="6" width="32" height="14" rx="4" fill="#22306B"/><circle cx="50" cy="45" r="19" fill="#fff"/><circle cx="50" cy="45" r="11" fill="#2F6BFF"/></svg>',
+ video:'<svg viewBox="0 0 110 80" role="img" aria-label="video"><rect x="4" y="14" width="74" height="54" rx="12" fill="#22306B"/><path d="M80 32 L106 18 V64 L80 50Z" fill="#22306B"/><circle cx="20" cy="28" r="6" fill="#FF5A4F"/></svg>',
+ lock:'<svg viewBox="0 0 80 90" role="img" aria-label="locked"><path d="M20 40 V28 Q20 8 40 8 Q60 8 60 28 V40" fill="none" stroke="#56607A" stroke-width="9"/><rect x="10" y="38" width="60" height="46" rx="10" fill="#56607A"/><circle cx="40" cy="58" r="7" fill="#fff"/></svg>'};
+
+/* ===== content ===== */
+const CRIMES=[['🔥','arson','Starting a fire on purpose.'],['🏠','burglary','Going into a house to steal.'],['💻','cybercrime','A crime on the internet.'],['🚐','kidnapping','Taking a person by force.'],['👊','mugging','Attacking someone in the street to steal.'],['⚰️','murder','Killing a person.'],['🔪','robbery','Stealing with force or threats.'],['🤫','theft','Stealing secretly, with no force.'],['🛒','shoplifting','Taking things from a shop without paying.'],['📦','smuggling','Moving things into a country illegally.'],['🧱','vandalism','Breaking things on purpose.']];
+const DET=[['🗂️','investigate a case','Find out what happened.','We investigate the missing trophy.',1],['🔎','search for evidence','Look for clues.','We find a photo and a video.',1],['🗣️','question a witness','Ask a person who saw it.','A witness saw a backpack.',1],['🧑','a suspect','A person who maybe did it.','Mia, Leo and Sam.',1],['🧪','analyse evidence','Look at clues carefully.','We look at the photo and the video.',1],['✅','prove something','Show it is true.','The video proves who did it.',1],['☝️','accuse a suspect','Say: “You did it!”','Never without evidence!',0],['🚓','arrest a suspect','Police take a person away.','The police arrested the thief.',0],['📄','charge a suspect','Police officially blame a person.','They charged him with theft.',0]];
+const SUS=[{id:'mia',name:'Mia',item:'red bag',kid:()=>kid('#F28B30','#5A2E14',{long:true}),bag:()=>tote('#E53935'),photo:''},
+ {id:'leo',name:'Leo',item:'blue backpack',kid:()=>kid('#7BC67E','#2B1B10'),bag:()=>backpack('#1E6FE8',false),photo:''},
+ {id:'sam',name:'Sam',item:'black backpack + ⭐',kid:()=>kid('#9B7BE0','#3A2414'),bag:()=>backpack('#1E2230',true),photo:''}];
+const CLUES=[{ic:()=>ICON.eye+backpack('#1E2230',true),n:'Clue 1 · The witness',t:'4:05 p.m. A witness saw a backpack with a ⭐ <b>white star</b>. She didn’t see the face.'},
+ {ic:()=>ICON.cam+tote('#E53935'),n:'Clue 2 · A photo',t:'4:05 p.m. <b>Mia</b> is at the <b>food stand</b>. 🌭'},
+ {ic:()=>ICON.video+trophy(),n:'Clue 3 · A video',t:'<b>Leo</b> leaves. The trophy is <b>still on the table</b>.'}];
+const QUIZ=[{q:'What crime happened?',o:[['🔪','a robbery'],['🤫','a theft'],['🧱','vandalism']],a:1},
+ {q:'What did the witness see?',o:[[()=>tote('#E53935'),'a red bag'],[()=>backpack('#1E6FE8',false),'a blue backpack'],[()=>backpack('#1E2230',true),'a backpack with a white star']],a:2},
+ {q:'Who is the main suspect?',o:[[()=>SUS[0].kid(),'Mia'],[()=>SUS[1].kid(),'Leo'],[()=>SUS[2].kid(),'Sam']],a:2},
+ {q:'What evidence proves it?',o:[['📸','the photo of Mia'],['🎥','the last video image'],['👁️','the witness']],a:1}];
+
+/* ===== state ===== */
+const STAGES=['welcome','crimes','detective','suspects','q1','q2','q3','q4','reveal','score'];
+const ICONS=['🏆','🚨','🕵️','🧑‍🤝‍🧑','🗳️','🎥','⭐'];
+const stepOf=i=>i<=3?i:i<=7?4:i===8?5:6;
+let S;const reset=()=>{S={i:0,clues:0,votes:[null,null,null,null],open:{},vs:false,shown:false}};reset();
+const $=s=>document.querySelector(s);
+const pic=p=>typeof p==='function'?p():p;
+
+function render(){
+  const st=STAGES[S.i],v=$('#view');
+  $('#steps').innerHTML=ICONS.map((e,k)=>`<li class="${k===stepOf(S.i)?'now':k<stepOf(S.i)?'done':''}" aria-current="${k===stepOf(S.i)?'step':'false'}">${e}</li>`).join('');
+  v.className='wrap anim';void v.offsetWidth;
+  ({welcome,crimes,detective,suspects,reveal,score}[st]||quiz)(v,st);
+  const back=$('#backBtn'),next=$('#nextBtn');
+  back.hidden=st==='welcome';next.hidden=st==='welcome';next.disabled=false;next.classList.remove('hot');next.textContent='Next ▶';
+  if(st[0]==='q'){const k=+st[1]-1;next.disabled=S.votes[k]===null;if(k===3){next.textContent='🔓 Reveal the solution';next.classList.add('hot')}}
+  if(st==='reveal'){next.disabled=!S.shown;next.textContent='⭐ Our score'}
+  if(st==='score'){next.textContent='↺ Restart';next.classList.add('hot')}
+  $('#where').textContent=st[0]==='q'?`Question ${st[1]} of 4`:'';
+  renderScript();$('#stage').scrollTop=0;
+}
+function welcome(v){
+  v.innerHTML=`<div class="welcome"><div>
+    <h1>The Case of the <span>Missing</span> Trophy</h1>
+    <div class="chips"><span class="chip">📍 School Fair</span><span class="chip">🕓 4:05 p.m.</span><span class="chip">🏆 English Contest</span></div>
+    <button class="go" id="startBtn">🔍 Start the investigation</button></div>
+    <div class="hero">${trophy('#D9E1EE')}<span class="q">?</span></div></div>`;
+  $('#startBtn').onclick=()=>go(1);
+}
+function cards(list,det){return list.map((c,k)=>{const key=(det?'d':'c')+k,o=S.open[key];return `<button class="pc ${o?'open':''}" data-k="${key}" aria-expanded="${!!o}">${det&&c[4]?'<span class="star" aria-label="in our story">⭐</span>':''}<span class="e" aria-hidden="true">${c[0]}</span><span class="w">${c[1]}</span><span class="d">${c[2]}</span>${det?`<span class="x">${det&&c[4]?'⭐ ':''}${c[3]}</span>`:''}</button>`}).join('')}
+function bindCards(v){v.querySelectorAll('.pc').forEach(b=>b.onclick=()=>{S.open[b.dataset.k]=!S.open[b.dataset.k];b.classList.toggle('open');b.setAttribute('aria-expanded',b.classList.contains('open'))})}
+function crimes(v){
+  if(S.vs){v.innerHTML=`<div class="title"><span class="em">⚖️</span><h2>Robbery or theft?</h2></div>
+    <div class="vs"><div class="side" style="--c:var(--coral)"><span class="big">🔪💰</span><h3>robbery</h3><b>With force or threats</b><span class="say">“Give me your money!”</span></div>
+    <div class="mid">VS</div>
+    <div class="side" style="--c:var(--teal)"><span class="big">🤫🚲</span><h3>theft</h3><b>Secret, no force</b><span class="say">“Oh no! My bike is gone!”</span></div></div>
+    <div><button class="vs-btn" id="vsBtn">◀ Back to the crimes</button></div>`;
+    $('#vsBtn').onclick=()=>{S.vs=false;render()};return}
+  v.innerHTML=`<div class="title"><span class="em">🚨</span><h2>Crimes</h2><span class="hint">👆 Tap a card</span></div>
+  <div class="grid">${cards(CRIMES)}</div>
+  <div><button class="vs-btn" id="vsBtn">⚖️ Robbery or theft?</button></div>`;
+  bindCards(v);$('#vsBtn').onclick=()=>{S.vs=true;render()};
+}
+function detective(v){
+  v.innerHTML=`<div class="title"><span class="em">🕵️</span><h2>Detective work</h2><span class="hint">👆 Tap a card · ⭐ = in our story</span></div>
+  <div class="grid">${cards(DET,true)}</div>`;bindCards(v);
+}
+function suspects(v){
+  const c=S.clues;
+  v.innerHTML=`<div class="title"><span class="em">🧑‍🤝‍🧑</span><h2>The suspects</h2></div>
+  <div class="sus-row">${SUS.map(s=>{const star=s.id==='sam'&&c>=1,safe=(s.id==='mia'&&c>=2)||(s.id==='leo'&&c>=3);
+    return `<div class="sus ${star?'star':''} ${safe?'safe':''}"><div class="pic">${s.photo?`<img src="${s.photo}" alt="${s.name}">`:s.kid()}${s.bag()}</div><span class="nm">${s.name}</span><span class="it">${s.item}</span>${safe?'<span class="badge ok">✔ alibi</span>':''}${star?'<span class="badge look">⭐ match!</span>':''}</div>`}).join('')}</div>
+  <div class="clue-zone">
+    <div style="text-align:center"><button class="go teal" id="clueBtn" ${c>=3?'disabled':''}>${c>=3?'✔ 3 clues':'🔎 Clue '+(c+1)}</button><div class="dots">${[0,1,2,3].map(k=>`<i class="${k<c?'on':''}"></i>`).join('')}</div></div>
+    ${c===0?`<div class="clue-big lock"><div class="ic">${ICON.lock}</div><div><div class="n">4 clues</div><div class="t">Tap the button to see clue 1.</div></div></div>`
+      :c<3?clueCard(CLUES[c-1]):`${clueCard(CLUES[2])}`}
+  </div>
+  ${c>=3?`<div class="clue-big lock" style="min-height:0;padding:10px 20px"><div class="ic">${ICON.lock.replace('<svg','<svg style="height:44px"')}</div><div><div class="n">Clue 4 · The last video image</div><div class="t">It’s a secret… until the end of the quiz! 🤐</div></div></div>`:''}`;
+  $('#clueBtn').onclick=()=>{if(S.clues<3){S.clues++;render()}};
+}
+const clueCard=c=>`<div class="clue-big"><div class="ic">${c.ic()}</div><div><div class="n">${c.n}</div><div class="t">${c.t}</div></div></div>`;
+function quiz(v,st){
+  const k=+st[1]-1,Q=QUIZ[k],vote=S.votes[k];
+  v.innerHTML=`<div class="qtop"><span class="qn">${k+1} / 4</span><span class="howto"><b>💬 Talk</b> → <b>✋ Vote with your fingers</b></span></div>
+  <h2 class="qtext">${Q.q}</h2>
+  <div class="opts">${Q.o.map(([p,t],j)=>`<button class="opt ${vote===j?'sel':''}" data-j="${j}" aria-pressed="${vote===j}"><span class="pic" aria-hidden="true">${pic(p)}</span><span class="tx">${t}</span><span class="row"><span class="L">${'ABC'[j]}</span><span class="fingers" aria-label="${j+1} finger${j?'s':''}">${'<i></i>'.repeat(j+1)}</span></span></button>`).join('')}</div>
+  <div class="saved">${vote===null?'👆 Tap the answer with the most votes.':`✔ Our vote: <b>${'ABC'[vote]}</b>`}</div>
+  ${k===2&&vote!==null?`<div class="mic"><span class="m">🎤</span><div><div class="f">I think it was <span></span> because <span></span>.</div><small>You can answer in Spanish, too. 😊</small></div></div>`:''}`;
+  v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{S.votes[k]=+b.dataset.j;render()});
+}
+function frame(){const strip=s=>s.replace(/<\/?svg[^>]*>/g,'');return `<svg viewBox="0 0 400 225" role="img" aria-label="Last video image: Sam takes the trophy. He has a black backpack with a white star.">
+  <defs><pattern id="scan" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="2" fill="#000"/></pattern></defs>
+  <rect width="400" height="225" fill="#33405A"/><rect y="150" width="400" height="75" fill="#45526C"/>
+  <rect x="30" y="122" width="150" height="14" fill="#8A6440"/><rect x="40" y="136" width="10" height="56" fill="#8A6440"/><rect x="160" y="136" width="10" height="56" fill="#8A6440"/>
+  <g transform="translate(262,78) scale(.6)">${strip(backpack('#1E2230',true))}</g>
+  <g transform="translate(200,42) scale(1.25)">${strip(kid('#9B7BE0','#3A2414'))}</g>
+  <g transform="translate(176,92) scale(.48)">${strip(trophy())}</g>
+  <rect x="228" y="14" width="78" height="26" rx="13" fill="#FFC93C"/><text x="267" y="33" text-anchor="middle" font-family="Baloo 2,Arial Black" font-weight="800" font-size="17" fill="#22306B">SAM</text>
+  <rect width="400" height="225" fill="url(#scan)" opacity=".15"/></svg>`}
+function reveal(v){
+  v.innerHTML=`<div class="reveal">
+    <div class="cam ${S.shown?'':'blur'}"><div class="bar"><span><span class="rec">● REC</span> CLUE 4</span><span>4:05 P.M.</span></div>${frame()}${S.shown?'':'<button class="playbtn" id="showBtn">▶ Show the video</button>'}</div>
+    <div class="who">${S.shown?`<h2>It was Sam!</h2>
+      <div class="bubble">🧑 “Yes, it was me. I’m sorry. Here is the trophy!” 🏆</div>
+      <div class="why"><span>👁️ the ⭐ backpack</span><span>📸 Mia: food stand</span><span>🎥 Leo: left before</span><span>🎥 Sam: took it</span></div>`
+      :`<h2 style="color:var(--navy)">Who took it?</h2><div class="bubble">🎥 Let’s look at the last video image…</div>`}</div></div>`;
+  const b=$('#showBtn');if(b)b.onclick=()=>{S.shown=true;render()};
+}
+function score(v){
+  const n=S.votes.filter((x,k)=>x===QUIZ[k].a).length;
+  v.innerHTML=`<div class="title"><span class="em">⭐</span><h2>Our score</h2></div>
+  <div class="scorebox"><div><div class="bignum">${n}/4</div><div class="stars" aria-hidden="true">${'⭐'.repeat(n)}${'☆'.repeat(4-n)}</div></div>
+  <ol class="ans">${QUIZ.map((Q,k)=>{const ok=S.votes[k]===Q.a;return `<li><span class="k">${k+1}</span><span>${Q.q}<br><b>${'ABC'[Q.a]} · ${Q.o[Q.a][1]}</b></span><span class="r ${ok?'ok':'no'}">${ok?'✔':'✘'} ${S.votes[k]===null?'—':'ABC'[S.votes[k]]}</span></li>`}).join('')}</ol></div>
+  <div class="bubble" style="text-align:center">🎉 Thank you, detectives! Case closed! 🎉</div>`;
+}
+function go(i){S.i=Math.max(0,Math.min(STAGES.length-1,i));render()}
+function restart(){reset();closeDrawer();render()}
+$('#nextBtn').onclick=()=>{if($('#nextBtn').disabled)return;STAGES[S.i]==='score'?restart():go(S.i+1)};
+$('#backBtn').onclick=()=>{if(STAGES[S.i]==='crimes'&&S.vs){S.vs=false;render()}else go(S.i-1)};
+document.addEventListener('keydown',e=>{if(e.target.closest&&e.target.closest('.drawer'))return;const n=$('#nextBtn');if(e.key==='ArrowRight'&&!n.disabled&&!n.hidden&&STAGES[S.i]!=='score')go(S.i+1);if(e.key==='ArrowLeft'&&S.i>0)$('#backBtn').click()});
+$('#fsBtn').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}};
+
+/* ===== script ===== */
+const R={P1:['Presentador/a 1','P'],P2:['Presentador/a 2','P'],D1:['Detective 1','D'],D2:['Detective 2','D'],H1:['Anfitrión/a 1','H'],H2:['Anfitrión/a 2','H'],W:['Testigo','W'],MIA:['Mia','S'],LEO:['Leo','S'],SAM:['Sam','S']};
+const SCRIPT={
+ welcome:['≈ 1 min',[['C','P1 y P2 al frente. Hablen despacio, sonrían y miren a las familias.'],['P1','Good afternoon, families! Welcome!'],['P2','Today, you are detectives with us!'],['P1','At the school fair, at 4:05 p.m., the English Contest trophy disappeared!'],['P2','Can you help us? Let\'s start the investigation!'],['C','El operador toca “Start the investigation”.']]],
+ crimes:['≈ 1.5 min',[['C','D1 toca 4 o 5 tarjetas (theft, robbery, burglary, shoplifting, vandalism) y lee la palabra en voz alta. No hace falta abrirlas todas.'],['D1','These are crime words. Shoplifting: taking things from a shop without paying.'],['C','El operador toca “Robbery or theft?”.'],['D2','Robbery is with force. Theft is secret, with no force.'],['D1','Is our case a robbery or a theft? Think about it!'],['C','No digan la respuesta: es la pregunta 1.']]],
+ detective:['≈ 1 min',[['C','D1 y D2 se turnan y abren las tarjetas con ⭐.'],['D1','Detectives investigate a case.'],['D2','We search for evidence and we question a witness.'],['D1','We analyse the evidence to prove who did it.'],['D2','Never accuse a suspect without evidence!']]],
+ suspects:['≈ 2 min',[['C','Mia, Leo y Sam pasan al frente con su bolsa o mochila.'],['MIA','Hi! I\'m Mia. I have a red bag.'],['LEO','Hello! I\'m Leo. I have a blue backpack.'],['SAM','Hi! I\'m Sam. I have a black backpack with a white star.'],['C','Operador: “Clue 1”.'],['W','At 4:05, I saw a backpack with a white star. I didn\'t see the face.'],['C','Operador: “Clue 2”.'],['D1','Look at this photo. Mia was at the food stand.'],['C','Operador: “Clue 3”.'],['D2','The video shows Leo leaving. The trophy was still on the table.'],['D1','There is one more clue… but it\'s a secret!'],['C','Nadie dice quién fue.']]],
+ q1:['Quiz ≈ 3 min',[['C','H1 lee la pregunta. H2 explica cómo votar (solo aquí). El operador toca la opción más votada y luego Next.'],['H1','Question 1: What crime happened?'],['H2','Talk to the person next to you. Then vote: one finger for A, two for B, three for C. Hands up!'],['H1','Thank you!']]],
+ q2:['',[['H1','Question 2: What did the witness see?'],['H2','Talk… and vote! Hands up!'],['H1','Thank you!']]],
+ q3:['',[['H1','Question 3: Who is the main suspect?'],['H2','Talk… and vote! Hands up!'],['C','Aparece el recuadro 🎤. H1 elige a una familia (30 segundos).'],['H1','Can a family explain? “I think it was… because…”. You can answer in Spanish!'],['H2','Thank you very much!']]],
+ q4:['',[['H1','Last question: What evidence proves it?'],['H2','Talk… and vote! Hands up!'],['H1','Now… let\'s reveal the solution!'],['C','El operador toca “Reveal the solution”.']]],
+ reveal:['≈ 1 min',[['D1','This is the last video image. Let\'s look!'],['C','El operador toca “Show the video”.'],['D2','It was Sam! The backpack with the white star!'],['SAM','Yes, it was me. I\'m sorry. Here is the trophy!'],['C','Sam entrega el trofeo a P1.'],['P1','Thank you, Sam!']]],
+ score:['',[['H1','Our score is… out of 4. Great job, families!'],['P2','Thank you for being detectives with us. Case closed!'],['C','Al final, el operador toca “Restart”.']]]};
+const NAMES={welcome:'1 · Bienvenida',crimes:'2 · Crimes',detective:'3 · Detective work',suspects:'4 · Sospechosos',q1:'5 · Pregunta 1',q2:'5 · Pregunta 2',q3:'5 · Pregunta 3',q4:'5 · Pregunta 4',reveal:'6 · Solución',score:'7 · Puntaje'};
+function renderScript(){const st=STAGES[S.i],[t,lines]=SCRIPT[st];$('#drawerTitle').textContent='Guion · '+NAMES[st];
+  $('#drawerBody').innerHTML=(t?`<div class="time">⏱ ${t} · Todo: 8–10 min</div>`:'')+lines.map(([r,x])=>r==='C'?`<div class="coord">${x}</div>`:`<div class="ln"><span class="role r-${R[r][1]}">${R[r][0]}</span><span class="en">${x}</span></div>`).join('')}
+function closeDrawer(){$('#drawer').hidden=true;$('#scriptBtn').setAttribute('aria-pressed','false')}
+$('#scriptBtn').onclick=()=>{const d=$('#drawer');d.hidden=!d.hidden;$('#scriptBtn').setAttribute('aria-pressed',String(!d.hidden))};
+$('#closeDrawer').onclick=closeDrawer;
+render();
+</script>
+</body>
+</html>
